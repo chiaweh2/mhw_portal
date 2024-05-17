@@ -13,7 +13,7 @@ The steps are described below.
 ------------------------------
 1. calculate monthly ensemble mean climatology for each model initialization month and lead time
 2. calculate the anomaly for each model by subtracting the climatology
-3. calculate the threshold based on the anomaly (fixed at 90, 95, 99 quantile for now)
+3. calculate the threshold based on the anomaly (fixed at 90 quantile for now)
 4. calculate the events that are higher than the threshold
 
 """
@@ -65,7 +65,7 @@ if __name__ == "__main__" :
         END_YEAR = 2020
 
         # three fixed threshold output
-        mhw_threshold = [90,95,99]
+        mhw_threshold = [90]
 
         print('-------------')
         print(modelname)
