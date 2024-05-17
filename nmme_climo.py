@@ -45,7 +45,8 @@ def nmme_ens_climo(ds,climo_dim='S',ens_dim='M'):
 def read_nmme(
         forecast_files : str,
         model : str,
-        base_dir : str = '/Datasets.private/marinehw/nmme_sst_raw/'
+        base_dir : str = '/Datasets.private/marinehw/nmme_sst_raw/',
+        chunks : dict = None
 ) -> xr.Dataset:
     """read the nmme data
 
@@ -60,18 +61,26 @@ def read_nmme(
     base_dir : str, optional
         the dir path to the raw nmme sst file,
         by default '/Datasets.private/marinehw/nmme_sst_raw/'
+    chunks : dict, optional
+        a dict object defining how `open_mfdataset()` method is 
+        going to chunk your file. By default, None (means letting
+        the method to used the data's original chunking)
 
     Returns
     -------
     xr.Dataset
         The nmme model with raw sst field
     """
+    if chunks is None:
+        chunks = {}
+
     print('reading data')
     ds_model = xr.open_mfdataset(
         forecast_files,
         decode_times=False,
         concat_dim='S',
-        combine='nested'
+        combine='nested',
+        chunks=chunks
     )
 
     # make sure variable name is sst
