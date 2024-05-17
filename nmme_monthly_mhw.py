@@ -19,8 +19,6 @@ from dask.distributed import Client
 from nmme_download import iri_nmme_models
 from nmme_climo import read_nmme
 
-
-
 def read_nmme_onlist(
         model_list: list[str],
         all_model_list: list[str],
@@ -58,6 +56,8 @@ def read_nmme_onlist(
                 model = modelname,
                 chunks={'M':1,'L':1,'S':1}
             )
+            # crop to only calculate the probability after 2020 (after Mike J's file)
+            ds_nmme = ds_nmme.where(ds_nmme['S.year']>2020,drop=True)
 
             da_model = ds_nmme['sst']
 
@@ -117,12 +117,12 @@ def output_format(
         output
     """
     ds = ds.rename(
-        dict(
-            X='lon',
-            Y='lat',
-            L='lead_time',
-            S='start_time'
-        )
+        {
+            'X':'lon',
+            'Y':'lat',
+            'L':'lead_time',
+            'S':'start_time'
+        }
     )
 
     # reformat datetime object
@@ -252,6 +252,8 @@ if __name__ == "__main__":
 
         command_line = f"ln -fs {OUTDIR}NMME_prob{m}_{date}.nc {OUTDIR}NMME_prob{m}_latest.nc"
         print(command_line)
-        subprocess.call(command_line,
-                            shell=True,
-                            executable="/usr/bin/bash")
+        subprocess.call(
+            command_line,
+            shell=True,
+            executable="/usr/bin/bash"
+        )
