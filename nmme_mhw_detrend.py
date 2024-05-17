@@ -13,7 +13,7 @@ The steps are described below.
 ------------------------------
 1. calculate monthly ensemble mean climatology for each model initialization month and lead time
 2. calculate the anomaly for each model by subtracting the climatology
-3. calculate the threshold based on the anomaly (fixed at 90, 95, 99 quantile for now)
+3. calculate the threshold based on the anomaly (fixed at 90 quantile for now)
 4. calculate the events that are higher than the threshold
 
 """
@@ -23,6 +23,7 @@ The steps are described below.
 # start a local cluster
 import sys
 import warnings
+from typing import Tuple
 import xarray as xr
 from dask.distributed import Client
 from nmme_climo import read_nmme
@@ -31,9 +32,30 @@ from nmme_download import iri_nmme_models
 
 warnings.simplefilter("ignore")
 
-def detrend(da, dim, deg=1):
-    """
-    detrending along `dim` with set `deg` for polynomial fit
+def detrend(
+        da: xr.DataArray,
+        dim: str,
+        deg: int=1
+) -> Tuple[xr.DataArray,xr.DataArray] :
+    """detrending along `dim` with set `deg` for polynomial fit
+
+    Parameters
+    ----------
+    da : xr.DataArray
+        The dataarray/variable one want to do linear detrend along `dim`
+    dim : str
+        dimension name where the linear detrending is performed
+    deg : int, optional
+        The linear detrend is tested. Setting to 2 will perform 2nd order
+        polynomial fitting and remove the linear and quadrature term,
+        by default 1
+
+    Returns
+    -------
+    Tuple[xr.DataArray,xr.DataArray]
+        Output include two xr.DataArray object. First one is 
+        the detrended `da` and second one is the polynomial
+        coeff. saved for detrending future dataset.
     """
     # detrend along a single dimension
     p = da.polyfit(dim=dim, deg=deg, skipna=True).compute()
@@ -103,7 +125,7 @@ if __name__ == "__main__" :
     BASEDIR='/Datasets.private/marinehw/nmme_sst_raw/'
     PROCDIR='/Datasets.private/marinehw/NMME_preprocess/'
     if len(sys.argv) < 2:
-        print("Usage: python nmme_mhw.py <model name>")
+        print("Usage: python nmme_mhw_detrend.py <model name>")
 
     dict_model = iri_nmme_models()
     avai_model_list = list(dict_model.keys())
@@ -130,7 +152,7 @@ if __name__ == "__main__" :
         END_YEAR = 2020
 
         # three fixed threshold output
-        mhw_threshold = [90,95,99]
+        mhw_threshold = [90]
 
         print('-------------')
         print(modelname)
