@@ -5,7 +5,7 @@ The following steps are done to create the MHW prediction
 - use the downloaded forecast to calculate detrended MHW
 - use the climatology from `/Datasets.private/marinehw/NMME_preprocess/` (based on 1991-2020)
 - use the threshold from `/Datasets.private/marinehw/NMME_preprocess/` (based on 1991-2020)
-- the file are stored in `/Datasets.private/marinehw/NMME_newforecast/`
+- the file are stored in `/Datasets.private/marinehw/nmme_mhw_prob/`
   the generated file will include all 2021 and onward MHW prediction (not just the new month)
 
 """
