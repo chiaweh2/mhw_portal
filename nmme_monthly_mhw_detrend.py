@@ -36,7 +36,7 @@ if __name__ == "__main__":
     BASEDIR = '/Datasets.private/marinehw/nmme_sst_raw/'
 
     # directory where sst threshold/climatology/trend (inputs) is located
-    PREDIR = '/Datasets.private/marinehw/NMME_preprocess/'
+    PREDIR = '/Datasets.private/marinehw/nmme_sst_stat/'
 
     # directory where nmme mhw probability is located
     OUTDIR = '/Datasets.private/marinehw/nmme_mhw_prob/'

@@ -32,7 +32,30 @@ def read_nmme_onlist(
     model_list : list[str]
         list of string of the model name one want to include
         in the MHW probability calculation
+    all_model_list : list[str]
+        list of string of all the avialable model name 
+        on prem
+    basedir : str
+        directory path to the raw NMME model output
+    predir : str
+        directory path to the NMME model statistics
+        (climatology, threshold, linear trend etc.)
+
+    Returns
+    -------
+    dict
+        'da_model_list': 
+            a list of xr.DataArray that includes each model output cropped to the
+            desired time period
+        'da_climo_list':
+            a list of xr.DataArray that includes each model climo
+        'da_nmem_all_out':
+            a xr.DataArray represents total member of all models used
+        'da_allmodel_mask':
+            a xr.DataArray represents mask for every S, L, X, Y 
+            (if "model" number less than 2 will be masked)
     """
+
 
     # read user input
     da_nmem_list = []
@@ -63,14 +86,6 @@ def read_nmme_onlist(
 
             # read climatology (1991-2020)
             da_ensmean_climo = xr.open_dataset(climo_file,chunks={'S':1,'L':1})['sst']
-
-            if modelname in ['CanCM4i', 'GEM-NEMO','CanCM4i-IC3','GEM5-NEMO']:
-                # the unit is in Kelvin
-                da_model = da_model-273.15
-                # prediction has value over land (use climo file as land mask)
-                da_mask = da_ensmean_climo.isel(month=0,L=0).drop_vars(['month','L'])
-                da_mask = da_mask.where(da_mask.isnull(),other=1)
-                da_model = da_model*da_mask
 
             # calculate ensemble member in each model
             da_nmem = da_model.where(da_model.isnull(), other=1).sum(dim=['M'])
@@ -174,7 +189,7 @@ if __name__ == "__main__":
     BASEDIR = '/Datasets.private/marinehw/nmme_sst_raw/'
 
     # directory where sst threshold/climatology/trend (inputs) is located
-    PREDIR = '/Datasets.private/marinehw/NMME_preprocess/'
+    PREDIR = '/Datasets.private/marinehw/nmme_sst_stat/'
 
     # directory where nmme mhw probability is located
     OUTDIR = '/Datasets.private/marinehw/nmme_mhw_prob/'
