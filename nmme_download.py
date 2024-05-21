@@ -57,10 +57,12 @@ def iri_nmme_models():
             f'{IRI_NMME}/.NCEP-CFSv2/.HINDCAST/.PENTAD_SAMPLES_FULL/.sst/dods'
         ],
         'CanCM4i-IC3' : [
-            f'{IRI_NMME}/.CanSIPS-IC3/.CanCM4i-IC3/.HINDCAST/.MONTHLY/.sst/dods'  
+            f'{IRI_NMME}/.CanSIPS-IC3/.CanCM4i-IC3/.HINDCAST/.MONTHLY/.sst/dods',
+            f'{IRI_NMME}/.CanSIPS-IC3/.CanCM4i-IC3/.FORECAST/.MONTHLY/.sst/dods'  
         ],
         'GEM5-NEMO' : [
-            f'{IRI_NMME}/.CanSIPS-IC3/.GEM5-NEMO/.HINDCAST/.MONTHLY/.sst/dods'
+            f'{IRI_NMME}/.CanSIPS-IC3/.GEM5-NEMO/.HINDCAST/.MONTHLY/.sst/dods',
+            f'{IRI_NMME}/.CanSIPS-IC3/.GEM5-NEMO/.FORECAST/.MONTHLY/.sst/dods'
         ],
         'COLA-RSMAS-CESM1' : [
             f'{IRI_NMME}/.COLA-RSMAS-CESM1/.MONTHLY/.sst/dods'
