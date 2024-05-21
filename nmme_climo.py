@@ -103,7 +103,7 @@ def read_nmme(
     da_model = ds_model['sst']
 
     if model in ['CanCM4i', 'GEM-NEMO']:
-        # the land part is zero for these two models
+        # the land part is zero for these two models in the earlier forecast (check 199101)
         da_model = da_model.where(da_model!=0)
         # the unit is in Kelvin
         da_model = da_model-273.15
@@ -118,14 +118,14 @@ def read_nmme(
         # the unit is in Kelvin
         da_model = da_model-273.15
 
-        # the land part is zero not NaN for this model
+        # the land part is with value not NaN for this model
         #  using old version model to mask land region
         da_mask = xr.open_mfdataset(
             f'{base_dir}CanCM4i_forecast_??_??_??_??????.nc',
             decode_times=False,
             concat_dim='S',
             combine='nested'
-        )['sst'].isel(S=0,L=0,M=0)
+        )['sst'].isel(S=0,L=0,M=0) #earlier forecast has 0 over land (check 199101)
         da_mask = da_mask.where(da_mask!=0)
         da_mask = da_mask.where(da_mask.isnull(),other=1)
         da_model = da_model*da_mask
@@ -136,14 +136,14 @@ def read_nmme(
         # the unit is in Kelvin
         da_model = da_model-273.15
 
-        # the land part is zero not NaN for this model
+        # the land part is with value not NaN for this model
         #  using old version model to mask land region
         da_mask = xr.open_mfdataset(
             f'{base_dir}GEM-NEMO_forecast_??_??_??_??????.nc',
             decode_times=False,
             concat_dim='S',
             combine='nested'
-        )['sst'].isel(S=0,L=0,M=0)
+        )['sst'].isel(S=0,L=0,M=0) #earlier forecast has 0 over land (check 199101)
         da_mask = da_mask.where(da_mask!=0)
         da_mask = da_mask.where(da_mask.isnull(),other=1)
         da_model = da_model*da_mask
