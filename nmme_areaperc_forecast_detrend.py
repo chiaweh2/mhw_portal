@@ -13,7 +13,7 @@ import cartopy.crs as ccrs
 import matplotlib.pyplot as plt
 from dask.distributed import Client
 from dateutil.relativedelta import relativedelta
-from nmme_areaperc_forecast_maps_hist import woa09_ocean_mask, plot_glo_map
+from nmme_areaperc_forecast import woa09_ocean_mask, plot_glo_map
 from nmme_areaperc_history_oisst_forecast_plume import plot_noaa_em
 from nmme_climo import read_nmme, iri_nmme_models
 

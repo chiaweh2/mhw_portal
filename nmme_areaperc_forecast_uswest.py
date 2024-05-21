@@ -15,7 +15,7 @@ from dateutil.relativedelta import relativedelta
 from nmme_download import iri_nmme_models
 from nmme_areaperc_climo import read_eez, region_mask
 from nmme_areaperc_history_oisst_forecast_plume import area_weighted_sum
-from nmme_areaperc_forecast_maps_hist import read_nmme_onlist_forecast
+from nmme_areaperc_forecast import read_nmme_onlist_forecast
 
 warnings.filterwarnings("ignore")
 
