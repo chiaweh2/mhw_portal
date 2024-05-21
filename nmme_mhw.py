@@ -37,7 +37,7 @@ if __name__ == "__main__" :
     print(client.cluster.dashboard_link)
 
     BASEDIR='/Datasets.private/marinehw/nmme_sst_raw/'
-    PROCDIR='/Datasets.private/marinehw/NMME_preprocess/'
+    PROCDIR='/Datasets.private/marinehw/nmme_sst_stat/'
     if len(sys.argv) < 2:
         print("Usage: python nmme_mhw.py <model name>")
 

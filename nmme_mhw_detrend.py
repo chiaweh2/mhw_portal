@@ -123,7 +123,7 @@ if __name__ == "__main__" :
     print(client.cluster.dashboard_link)
 
     BASEDIR='/Datasets.private/marinehw/nmme_sst_raw/'
-    PROCDIR='/Datasets.private/marinehw/NMME_preprocess/'
+    PROCDIR='/Datasets.private/marinehw/nmme_sst_stat/'
     if len(sys.argv) < 2:
         print("Usage: python nmme_mhw_detrend.py <model name>")
 
@@ -144,8 +144,8 @@ if __name__ == "__main__" :
         forecast_files = f'{BASEDIR}{modelname}_forecast_??_??_??_??????.nc'
         climo_file0 = f'{PROCDIR}{modelname}_climo.nc'
         output_file0 = f'{PROCDIR}{modelname}_polyfit_p.nc'
-        output_file1 = f'{PROCDIR}{modelname}_threshold.nc'
-        output_file2 = f'{PROCDIR}{modelname}_mhw.nc'
+        output_file1 = f'{PROCDIR}{modelname}_threshold_detrend.nc'
+        output_file2 = f'{PROCDIR}{modelname}_mhw_detrend.nc'
 
         # consistent threshold period
         START_YEAR = 1991
