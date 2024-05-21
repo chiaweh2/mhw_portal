@@ -114,7 +114,6 @@ def read_nmme_onlist_forecast(
             # read climatology (1991-2020)
             da_ensmean_climo = xr.open_dataset(climo_file,chunks={'S':1,'L':1})['sst']
 
-
             # calculate ensemble member in each model
             da_nmem = da_model.where(da_model.isnull(), other=1).sum(dim=['M'])
             da_nmem = da_nmem.where(da_nmem>0)
