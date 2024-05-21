@@ -2,8 +2,9 @@
 The script is designed to produced MHW area percentage based on NMME.
 
 """
-
+import warnings
 from datetime import date,datetime
+import cftime
 import xarray as xr
 import numpy as np
 import cartopy.crs as ccrs
@@ -12,13 +13,209 @@ import cartopy.feature as cfeature
 import matplotlib.pyplot as plt
 from dask.distributed import Client
 from dateutil.relativedelta import relativedelta
+from nmme_climo import read_nmme
 from nmme_areaperc_climo import woa09_ocean_mask
 from nmme_areaperc_history_oisst_forecast_plume import plot_noaa_em
 from nmme_download import iri_nmme_models
-from nmme_areaperc_forecast_maps_hist_uswest import read_nmme_onlist_forecast
 
-import warnings
 warnings.filterwarnings("ignore")
+
+##################################  function  #####################################
+def read_nmme_onlist_forecast(
+        current_year: int,
+        current_month: int,
+        model_list: list[str],
+        all_model_list: list[str],
+        basedir: str,
+        predir: str,
+        threshold: int = 90
+) -> dict:
+    """read in the NMME for MHW area percentage count
+
+    Parameters
+    ----------
+    current_year: int
+        current year that helps extract from the 
+        latest model forecast
+    current_month: int
+        current month that helps extract from the 
+        latest model forecast
+    model_list : list[str]
+        list of string of the model name one want to include
+        in the MHW probability calculation
+    all_model_list : list[str]
+        list of string of all the avialable model name 
+        on prem
+    basedir : str
+        directory path to the raw NMME model output
+    predir : str
+        directory path to the NMME model statistics
+        (climatology, threshold, linear trend etc.)
+    threshold : int
+        the threshold of determine the MHW
+
+    Returns
+    -------
+    da_mhw_prob :
+        a xr.DataArray represents the MHW probability
+    da_anom_all :
+        a xr.DataArray represents the sst anomaly for all model 
+        in the latest update
+    da_mhw_anom_all :
+        a xr.DataArray represents the sst anomaly only over the 
+        identified mhw region for all model in the latest update
+    da_nmem_all_out :
+        a xr.DataArray represents the number of ensemble members
+        in all model in the latest update
+    da_ensmask_all : 
+        a xr.DataArray represents the mask based on the number of 
+        available models in the latest update
+
+    """
+
+    da_nmem_list = []
+    da_model_list = []
+    da_climo_list = []
+    avai_model_list = []
+    for modelname in model_list:
+        if modelname in all_model_list:
+
+            # construct model list
+            forecast_files = f'{basedir}{modelname}_forecast_??_??_??_??????.nc'
+            climo_file = f'{predir}{modelname}_climo.nc'
+
+            print('------------')
+            print(modelname)
+            print('------------')
+
+
+            # lazy loading all dataset
+            ds_nmme = read_nmme(
+                forecast_files = forecast_files,
+                model = modelname,
+                chunks={'M':1,'L':1,'S':1}
+            )
+
+            da_model = ds_nmme['sst']
+
+            try :
+                da_model = da_model.sel(
+                    S=cftime.Datetime360Day(
+                        current_year, current_month, 1, 0, 0, 0, 0, has_year_zero=True
+                    )
+                )
+            except KeyError:
+                # if any of the date in slice does not exist, the data is fill with NaN
+                da_model = da_model.isel(S=-1)*np.nan
+                da_model['S'] = cftime.Datetime360Day(
+                    current_year, current_month, 1, 0, 0, 0, 0, has_year_zero=True
+                )
+
+            # read climatology (1991-2020)
+            da_ensmean_climo = xr.open_dataset(climo_file,chunks={'S':1,'L':1})['sst']
+
+
+            # calculate ensemble member in each model
+            da_nmem = da_model.where(da_model.isnull(), other=1).sum(dim=['M'])
+            da_nmem = da_nmem.where(da_nmem>0)
+
+            # stored all models in one list
+            da_nmem_list.append(da_nmem)           # number of ensemble member
+            da_model_list.append(da_model)         # model output
+            da_climo_list.append(da_ensmean_climo) # model climatology
+            avai_model_list.append(modelname)
+
+    # combined all model into one dataset
+    da_model_all = xr.concat(
+        [da for da in da_model_list if type(da) != type("string")],
+        dim='model',
+        join='outer'
+    ).compute()
+    da_model_all['model'] = avai_model_list
+    da_climo_all = xr.concat(
+        [da for da in da_climo_list if type(da) != type("string")],
+        dim='model',
+        join='outer'
+    ).compute()
+    da_climo_all['model'] = avai_model_list
+    da_nmem_all = xr.concat(
+        [da for da in da_nmem_list if type(da) != type("string")],
+        dim='model',
+        join='outer'
+    ).compute()
+    da_nmem_all['model'] = avai_model_list
+    da_ensmask_all = xr.concat(
+        [da for da in da_model_list if type(da) != type("string")],
+        dim='model',
+        join='outer'
+    )
+    da_ensmask_all['model'] = avai_model_list
+
+    da_ensmask_all = da_ensmask_all.sum(dim=['X','Y']).compute()
+    da_ensmask_all = da_ensmask_all.where(da_ensmask_all==0,other=1)
+    da_ensmask_all = da_ensmask_all.where(da_ensmask_all==1)
+
+    # create mask for every S, L, X, Y (if model number less than 2 will be masked)
+    da_nmodel = (da_nmem_all/da_nmem_all).sum(dim='model')
+    da_nmodel_mask = da_nmodel.where(da_nmodel>1)
+    da_allmodel_mask = da_nmodel_mask.where(da_nmodel_mask.isnull(),other=1).compute()
+
+    # calculate total member of all model
+    da_nmem_all_out = (da_nmem_all*da_allmodel_mask).sum(dim='model').compute()
+
+    # loop through all set threshold
+    m = threshold
+    da_mhw_list = []
+    da_anom_list = []
+    da_mhw_anom_list = []
+    avai_model_list = []
+    for modelname in model_list:
+        if modelname in all_model_list:
+
+            # construct model file
+            threshold_file = f'{predir}{modelname}_threshold{m}.nc'
+
+            print('------------')
+            print(modelname,' MHW detection...')
+            print('------------')
+
+            # read threshold (1991-2020)
+            da_threshold = xr.open_dataset(
+                threshold_file,
+                chunks={'S':1,'L':1}
+            )[f'threshold_{m}']
+
+            print('calculating anomaly')
+            month = da_model_all.sel(model=modelname)['S.month'].data
+            da_anom = da_model_all.sel(model=modelname) - da_climo_all.sel(model=modelname).sel(month=month)
+            da_anom_list.append(da_anom)
+            avai_model_list.append(modelname)
+
+            print('calculating MHW')
+            month = da_anom.month.data
+            da_mhw_temp = da_anom.where(da_anom>=da_threshold.sel(month=month))
+            da_mhw_anom_list.append(da_mhw_temp)
+            da_mhw = (da_mhw_temp
+                        .where(da_mhw_temp.isnull(),other=1)
+                        .sum(dim='M',skipna=True)
+            )
+            da_mhw_list.append(da_mhw)
+
+    da_anom_list = [da for da in da_anom_list if type(da) != type("string")]
+    da_mhw_anom_list = [da for da in da_mhw_anom_list if type(da) != type("string")]
+    da_mhw_list = [da for da in da_mhw_list if type(da) != type("string")]
+
+    da_anom_all = xr.concat(da_anom_list,dim='model',join='outer')
+    da_anom_all['model'] = avai_model_list
+
+    da_mhw_anom_all = xr.concat(da_mhw_anom_list,dim='model',join='outer')
+    da_mhw_anom_all['model'] = avai_model_list
+
+    da_mhw_all = xr.concat(da_mhw_list,dim='model',join='outer')
+    da_mhw_all_out = (da_mhw_all*da_allmodel_mask).sum(dim='model').compute()
+    da_mhw_prob = (da_mhw_all_out/da_nmem_all_out)*da_allmodel_mask
+
+    return da_mhw_prob,da_anom_all,da_mhw_anom_all,da_nmem_all_out,da_ensmask_all
 
 def plot_glo_map(
     ax,
@@ -302,8 +499,8 @@ if __name__ == '__main__':
         ds_perc_climo = xr.open_dataset(climo_areaperc_file)
         ds_perc_climo = ds_perc_climo.where(ds_perc_climo!=0)
         # pick the same month in climo file
-        month = da_mask_ts.month.data
-        da_perc_climo = ds_perc_climo.sel(month=month)
+        mhw_month = da_mask_ts.month.data
+        da_perc_climo = ds_perc_climo.sel(month=mhw_month)
         da_perc_climo = da_perc_climo.mean(dim='M')
         da_perc_climo = da_perc_climo.mean(dim='model').compute()
 
