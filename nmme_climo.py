@@ -94,10 +94,7 @@ def read_nmme(
         ds_model = ds_model.rename({varname:'sst'})
         print(f'variable name convert from {varname} to sst')
 
-    print('dropping duplicate between forecast and hindcast')
-    print(f'original S : {len(ds_model.S.values)}')
-    da_model = ds_model['sst'].drop_duplicates(dim='S')
-    print(f'modified S : {len(da_model.S.values)}')
+    ds_model = ds_model.drop_duplicates(dim='S')
 
     ds_model['S'] = cftime.num2date(ds_model['S'],
                                     ds_model.S.units,
@@ -162,7 +159,7 @@ if __name__ == "__main__":
     print(client.cluster.dashboard_link)
 
     BASEDIR = '/Datasets.private/marinehw/nmme_sst_raw/'
-    OUTPUTDIR = '/Datasets.private/marinehw/NMME_preprocess/'
+    OUTPUTDIR = '/Datasets.private/marinehw/nmme_sst_stat/'
     if len(sys.argv) < 2:
         print("Usage: python nmme_climo.py <model name>")
 
@@ -201,7 +198,7 @@ if __name__ == "__main__":
         )
 
         print('calculating climatology')
-        ds_ensmean_climo = nmme_ens_climo(ds_nmme,climo_dim='S',ens_dim='M')
+        ds_ensmean_climo = nmme_ens_climo(ds_nmme,climo_dim='S',ens_dim='M').compute()
 
         print('file output')
         ds_ensmean_climo.to_netcdf(output_file)
