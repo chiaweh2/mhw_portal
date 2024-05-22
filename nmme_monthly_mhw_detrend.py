@@ -3,9 +3,9 @@ The script is designed to produced detrended MHW probability based on NMME.
 
 The following steps are done to create the MHW prediction
 - use the downloaded forecast to calculate detrended MHW
-- use the climatology from `/Datasets.private/marinehw/NMME_preprocess/` (based on 1991-2020)
-- use the threshold from `/Datasets.private/marinehw/NMME_preprocess/` (based on 1991-2020)
-- use the linear trend from `/Datasets.private/marinehw/NMME_preprocess/` (based on 1991-2020)
+- use the climatology from `/Datasets.private/marinehw/nmme_sst_stat/` (based on 1991-2020)
+- use the threshold from `/Datasets.private/marinehw/nmme_sst_stat/` (based on 1991-2020)
+- use the linear trend from `/Datasets.private/marinehw/nmme_sst_stat/` (based on 1991-2020)
 - the file are stored in `/Datasets.private/marinehw/nmme_mhw_prob/`
   the generated file will include all 2021 and onward MHW prediction (not just the new month)
 
