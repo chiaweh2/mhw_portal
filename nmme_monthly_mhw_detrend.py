@@ -10,7 +10,7 @@ The following steps are done to create the MHW prediction
   the generated file will include all 2021 and onward MHW prediction (not just the new month)
 
 """
-
+import json
 import warnings
 import subprocess
 from datetime import date
@@ -48,15 +48,9 @@ if __name__ == "__main__":
     threshold = [90]
 
     # used model list
-    model_use_list = [
-        'CanCM4i-IC3',
-        'GEM5-NEMO',
-        'GFDL-SPEAR-regridded',
-        'NASA-GEOSS2S',
-        'COLA-RSMAS-CCSM4',
-        'COLA-RSMAS-CESM1',
-        'NCEP-CFSv2'
-    ]
+    with open('model_use_list.json','r',encoding='utf-8') as f:
+        json_dict = json.load(f)
+    model_use_list = json_dict['model_use_list']
 
     dict_model = iri_nmme_models()
     avai_model_list = list(dict_model.keys())

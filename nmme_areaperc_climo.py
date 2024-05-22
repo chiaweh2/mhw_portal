@@ -16,6 +16,7 @@ The steps are described below.
 4. Calculate the climatology of the area percentage based on the same period 
    (climatology_period = [1991,2020])
 """
+import json
 import numpy as np
 import xarray as xr
 import xesmf as xe
@@ -343,15 +344,9 @@ if __name__ == "__main__" :
     client = Client(processes=False)
 
     # used model list
-    model_use_list = [
-        'CanCM4i-IC3',
-        'GEM5-NEMO',
-        'GFDL-SPEAR-regridded',
-        'NASA-GEOSS2S',
-        'COLA-RSMAS-CCSM4',
-        'COLA-RSMAS-CESM1',
-        'NCEP-CFSv2'
-    ]
+    with open('model_use_list.json','r',encoding='utf-8') as f:
+        json_dict = json.load(f)
+    model_use_list = json_dict['model_use_list']
 
     dict_model = iri_nmme_models()
     avai_model_list = list(dict_model.keys())

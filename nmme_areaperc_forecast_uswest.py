@@ -2,6 +2,7 @@
 The script is designed to produced MHW area percentage based on NMME.
 
 """
+import json
 import warnings
 from datetime import date,datetime
 import xarray as xr
@@ -158,15 +159,9 @@ if __name__ == '__main__':
     client = Client(processes=False)
 
     # used model list
-    model_use_list = [
-        'CanCM4i-IC3',
-        'GEM5-NEMO',
-        'GFDL-SPEAR-regridded',
-        'NASA-GEOSS2S',
-        'COLA-RSMAS-CCSM4',
-        'COLA-RSMAS-CESM1',
-        'NCEP-CFSv2'
-    ]
+    with open('model_use_list.json','r',encoding='utf-8') as f:
+        json_dict = json.load(f)
+    model_use_list = json_dict['model_use_list']
 
 
     dict_model = iri_nmme_models()
