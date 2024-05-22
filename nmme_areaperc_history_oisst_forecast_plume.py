@@ -259,7 +259,6 @@ def nmme_newest_forecast(threshold=90):
             print(modelname,' MHW detection...')
             print('------------')
 
-    
             # read threshold (1991-2020)
             da_threshold = xr.open_dataset(
                 threshold_file,
@@ -293,7 +292,6 @@ def nmme_newest_forecast(threshold=90):
 
             # construct model list
             forecast_files = f'{basedir}{modelname}_forecast_??_??_??_??????.nc'
-            climo_file = f'{predir}{modelname}_climo.nc'
 
             print('------------')
             print(modelname)
@@ -330,10 +328,15 @@ def nmme_newest_forecast(threshold=90):
                     cftime.Datetime360Day(pyear, pmonth, 1, 0, 0, 0, 0, has_year_zero=True),
                     cftime.Datetime360Day(cyear, cmonth, 1, 0, 0, 0, 0, has_year_zero=True)
                 ]
-
-
             da_model_list.append(da_model)         # model output
 
+    # combined all model into one dataset
+    da_model_all = xr.concat(
+        [da for da in da_model_list if type(da) != type("string")],
+        dim='model',
+        join='outer'
+    ).compute()
+    da_model_all['model'] = avai_model_list
 
     # loop through all set threshold
     da_mhw_list = []  # previous da_mhw_list emptied
@@ -1042,12 +1045,15 @@ if __name__ == "__main__":
     client = Client(processes=False)
     OISST_OBS_DATA = True
     NMME_MODEL_DATA = True
-    OUTPUT_DATA_DIR = '/Public/chsu/share_mhw/'
     PREMONTH = 24                          # historical record to include in plume plot (month)
     # PROC_TIME = '24_01_22'               # new OISST file that include start from 1982
-    # OUTPUTDIR = '/home/chsu/MHW/figure/'
+
     PROC_TIME = 'latest'
-    OUTPUTDIR = '/httpd-test/psd/marine-heatwaves/img/'
+    OUTPUTDIR = '/home/chsu/mhw_portal/figures/'
+    OUTPUT_DATA_DIR = '/home/chsu/mhw_portal/data/'
+    # OUTPUTDIR = '/httpd-test/psd/marine-heatwaves/img/'
+    # OUTPUT_DATA_DIR = '/Public/chsu/share_mhw/'
+
 
     #### Calculating area percentage for observational data
     obs_mask_dict = all_obs_area_mask(proc_time=PROC_TIME)
