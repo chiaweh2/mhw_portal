@@ -8,7 +8,6 @@ Only the newest forecast will be download!!!
 
 import datetime
 import glob
-from datetime import date
 import cftime
 import numpy as np
 import xarray as xr
@@ -25,7 +24,8 @@ if __name__=="__main__":
     today_month = int(today.month)
     today_day = int(today.day)
 
-    today = date.today()
+    # date form (download stamp)
+    today = datetime.date.today()
     dateform = today.strftime("%y_%m_%d")
 
     # get all hindcast and forecast IRI OPeNDAP URL
@@ -50,12 +50,18 @@ if __name__=="__main__":
             f'{OUTPUTDIR}'+
             f'{name}_forecast_??_??_??_??????.nc'
         )
-        ds_forecast_old = xr.open_mfdataset(on_disc_list,decode_times=False)
+        ds_forecast_old = xr.open_mfdataset(
+            on_disc_list,
+            decode_times=False,
+            concat_dim='S',
+            combine='nested'
+        )
         ds_forecast_old['S'] = cftime.num2date(
             ds_forecast_old.S.values,
             ds_forecast_old.S.units,
             calendar='360_day'
         )
+        ds_forecast_old = ds_forecast_old.sortby('S')
         ds_forecast_old = ds_forecast_old.isel(S=slice(-1,None))
 
         # find IRI availability
