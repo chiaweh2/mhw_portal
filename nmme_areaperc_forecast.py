@@ -429,12 +429,12 @@ if __name__ == '__main__':
             cbar.set_label(label='MHW magnitude (degC)',size=20, labelpad=15)
 
     fig = plot_noaa_em(fig,set_ax=[2*HGAP+0.05,0-0.23,0.15,0.15])
-    # fig.savefig('/httpd-test/psd/marine-heatwaves/img/MHW_maps.png', dpi=150, facecolor='w', edgecolor='w',
-    #                 orientation='portrait', format=None,
-    #                 transparent=False, bbox_inches="tight", pad_inches=None)
-    fig.savefig('/home/chsu/mhw_portal/figures/MHW_maps.png', dpi=150, facecolor='w', edgecolor='w',
+    fig.savefig('/httpd-test/psd/marine-heatwaves/img/MHW_maps.png', dpi=150, facecolor='w', edgecolor='w',
                     orientation='portrait', format=None,
                     transparent=False, bbox_inches="tight", pad_inches=None)
+    # fig.savefig('/home/chsu/mhw_portal/figures/MHW_maps.png', dpi=150, facecolor='w', edgecolor='w',
+    #                 orientation='portrait', format=None,
+    #                 transparent=False, bbox_inches="tight", pad_inches=None)
 
 
     # Calculating area percentage
@@ -580,15 +580,15 @@ if __name__ == '__main__':
     legend.set_bbox_to_anchor((1.32, 0.65))
     ax1.grid(linestyle='dashed')
 
-    fig.savefig(
-        '/home/chsu/mhw_portal/figures/MHW_area_bar.png',
-        dpi=300, facecolor='w', edgecolor='w',
-        orientation='portrait',
-        transparent=False,
-        bbox_inches="tight",
-        pad_inches=None
-    )
-    # fig = plot_noaa_em(fig,set_ax=[1.2,0.75-0.11,0.1,0.1])
-    # fig.savefig('/httpd-test/psd/marine-heatwaves/img/MHW_area_bar.png', dpi=300, facecolor='w', edgecolor='w',
-    #                 orientation='portrait',
-    #                 transparent=False, bbox_inches="tight", pad_inches=None)
+    # fig.savefig(
+    #     '/home/chsu/mhw_portal/figures/MHW_area_bar.png',
+    #     dpi=300, facecolor='w', edgecolor='w',
+    #     orientation='portrait',
+    #     transparent=False,
+    #     bbox_inches="tight",
+    #     pad_inches=None
+    # )
+    fig = plot_noaa_em(fig,set_ax=[1.2,0.75-0.11,0.1,0.1])
+    fig.savefig('/httpd-test/psd/marine-heatwaves/img/MHW_area_bar.png', dpi=300, facecolor='w', edgecolor='w',
+                    orientation='portrait',
+                    transparent=False, bbox_inches="tight", pad_inches=None)

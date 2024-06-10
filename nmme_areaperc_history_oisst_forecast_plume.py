@@ -323,7 +323,7 @@ def nmme_newest_forecast(threshold=90):
                 ]
             if len(da_model.S) != 2:
                  # if only one date in slice does exist, the data is still fill with NaN
-                da_model = da_model.isel(S=range(-2,0))*np.nan
+                da_model = ds_nmme['sst'].isel(S=range(-2,0))*np.nan
                 da_model['S'] = [
                     cftime.Datetime360Day(pyear, pmonth, 1, 0, 0, 0, 0, has_year_zero=True),
                     cftime.Datetime360Day(cyear, cmonth, 1, 0, 0, 0, 0, has_year_zero=True)
@@ -1049,10 +1049,10 @@ if __name__ == "__main__":
     # PROC_TIME = '24_01_22'               # new OISST file that include start from 1982
 
     PROC_TIME = 'latest'
-    OUTPUTDIR = '/home/chsu/mhw_portal/figures/'
-    OUTPUT_DATA_DIR = '/home/chsu/mhw_portal/data/'
-    # OUTPUTDIR = '/httpd-test/psd/marine-heatwaves/img/'
-    # OUTPUT_DATA_DIR = '/Public/chsu/share_mhw/'
+    # OUTPUTDIR = '/home/chsu/mhw_portal/figures/'
+    # OUTPUT_DATA_DIR = '/home/chsu/mhw_portal/data/'
+    OUTPUTDIR = '/httpd-test/psd/marine-heatwaves/img/'
+    OUTPUT_DATA_DIR = '/Public/chsu/share_mhw/'
 
 
     #### Calculating area percentage for observational data
