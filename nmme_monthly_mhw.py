@@ -24,7 +24,9 @@ def read_nmme_onlist(
         model_list: list[str],
         all_model_list: list[str],
         basedir: str,
-        predir: str
+        predir: str,
+        start_year: int = 2021,
+        lazy: bool = False
 ) -> dict:
     """read in the NMME for MHW detection
 
@@ -41,6 +43,13 @@ def read_nmme_onlist(
     predir : str
         directory path to the NMME model statistics
         (climatology, threshold, linear trend etc.)
+    start_year : int
+        the year where before is cropped out for analysis. 
+        Default for mhw is 2021 (before 2021 is using Mike J's file)
+    lazy : boolen
+        the output dictionary of dataarray are all in lazy mode (True),
+        or some computed to avoid duplicate calculation (False, Default)
+    
 
     Returns
     -------
@@ -81,7 +90,7 @@ def read_nmme_onlist(
                 chunks={'M':1,'L':1,'S':1}
             )
             # crop to only calculate the probability after 2020 (after Mike J's file)
-            ds_nmme = ds_nmme.where(ds_nmme['S.year']>2020,drop=True)
+            ds_nmme = ds_nmme.where(ds_nmme['S.year']>(start_year-1),drop=True)
 
             da_model = ds_nmme['sst']
 
@@ -98,15 +107,27 @@ def read_nmme_onlist(
             da_climo_list.append(da_ensmean_climo) # model climatology
 
     # combined all model into one dataset
-    da_nmem_all = xr.concat(da_nmem_list,dim='model',join='outer')
+    if lazy :
+        da_nmem_all = xr.concat(da_nmem_list,dim='model',join='outer')
+    else:
+        da_nmem_all = xr.concat(da_nmem_list,dim='model',join='outer').persist()
 
     # create mask for every S, L, X, Y (if model number less than 2 will be masked)
     da_nmodel = (da_nmem_all/da_nmem_all).sum(dim='model')
     da_nmodel_mask = da_nmodel.where(da_nmodel>1)
-    da_allmodel_mask = da_nmodel_mask.where(da_nmodel_mask.isnull(),other=1).compute()
+    if lazy :
+        da_allmodel_mask = da_nmodel_mask.where(da_nmodel_mask.isnull(),other=1)
+    else:
+        da_allmodel_mask = da_nmodel_mask.where(da_nmodel_mask.isnull(),other=1).compute()
 
     # calculate total member of all model
-    da_nmem_all_out = (da_nmem_all*da_allmodel_mask).sum(dim='model').compute()
+    if lazy :
+        da_nmem_all_out = (da_nmem_all*da_allmodel_mask).sum(dim='model')
+    else:
+        da_nmem_all_out = (da_nmem_all*da_allmodel_mask).sum(dim='model').compute()
+
+    # release memory for the persisted da_nmem_all
+    del da_nmem_all
 
     return {
         'da_model_list':da_model_list,
