@@ -176,9 +176,21 @@ def output_format(
         # when month variable is not there
         print('no month coord')
 
+    # find dimension order for chunking
+    dim_list = list(ds['mhw_probability'].dims)
+    chunk_dict = {
+        'lead_time': 12,
+        'start_time': 1,
+        'lon': 100,
+        'lat': 100
+    }
+    chunk_order = []
+    for dim in dim_list:
+        chunk_order.append(chunk_dict[dim])
+
     encoding_list = {}
     encoding_list['mhw_probability'] = {}
-    encoding_list['mhw_probability']['chunksizes'] = [1, 12, 100, 100]
+    encoding_list['mhw_probability']['chunksizes'] = chunk_order
     encoding_list['mhw_probability']['contiguous'] = False
     encoding_list['start_time'] = {}
     encoding_list['start_time']['chunksizes'] = [1]
