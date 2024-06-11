@@ -365,3 +365,4 @@ if __name__ == '__main__':
         bbox_inches="tight",
         pad_inches=None
     )
+    client.close()

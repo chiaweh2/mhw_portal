@@ -24,7 +24,7 @@ if __name__ == "__main__":
     warnings.filterwarnings("ignore")
 
     ### open local cluster
-    client = Client(n_workers=2,threads_per_worker=60,processes=False)
+    client = Client(processes=False)
 
     ###### Setting ######
     # specify date
@@ -123,3 +123,5 @@ if __name__ == "__main__":
             shell=True,
             executable="/usr/bin/bash"
         )
+
+        client.close()

@@ -592,3 +592,4 @@ if __name__ == '__main__':
     fig.savefig('/httpd-test/psd/marine-heatwaves/img/MHW_area_bar.png', dpi=300, facecolor='w', edgecolor='w',
                     orientation='portrait',
                     transparent=False, bbox_inches="tight", pad_inches=None)
+    client.close()

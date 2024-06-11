@@ -1166,3 +1166,4 @@ if __name__ == "__main__":
     if NMME_MODEL_DATA:
         save_nmme_data(ds_perc['global'],detrend=False,output_dir=OUTPUT_DATA_DIR)
         save_nmme_data(ds_perc['global_detrend'],detrend=True,output_dir=OUTPUT_DATA_DIR)
+    client.close()
