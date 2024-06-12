@@ -214,7 +214,7 @@ def read_nmme_onlist_areaperc(
     if region == 'eez':
         # read region
         x_list_mj, y_list_mj = read_eez()
-        # df_eez=pd.read_csv('/home/chsu/MHW/west_coast_eez_outline.csv',header=None)
+        # df_eez=pd.read_csv('/home/chsu/mhw_portal/resource/west_coast_eez_outline.csv',header=None)
         # y_list_mj = df_eez[0].values
         # x_list_mj = df_eez[1].values
 
@@ -228,6 +228,13 @@ def read_nmme_onlist_areaperc(
 
         da_global_region = region_mask(x_list_mj,y_list_mj,da_global,xname='X',yname='Y')
         da_global = da_global*da_global_region
+        # if da_global['X'].min().data<0:
+        #     # change mask coordinate to -180-180
+        #     da_global_region['X'] = da_global_region['X'].where(
+        #         da_global_region['X']<=180.,
+        #         other=da_global_region['X']-360.
+        #     )
+
 
     # calculate mhw mask based on all models, S, L, M
     da_mhw_all = da_mhw_all.where(da_mhw_all.isnull(), other=1)
@@ -245,10 +252,9 @@ def read_nmme_onlist_areaperc(
 def read_eez():
     """
     The function read the EEZ csv file.
-
     """
 
-    df_eez=pd.read_csv('/home/chsu/MHW/west_coast_eez_outline.csv',header=None)
+    df_eez=pd.read_csv('/home/chsu/mhw_portal/resource/west_coast_eez_outline.csv',header=None)
     y_list = df_eez[0].values
     x_list = df_eez[1].values
 
@@ -290,8 +296,10 @@ def region_mask(
         data strucuture and information provided by 
         the `da_data`
     """
-    lon_array = da_data[xname].values
-    lat_array = da_data[yname].values
+
+    # .copy() to avoid changing the da_data original lon lat 
+    lon_array = da_data[xname].data.copy()
+    lat_array = da_data[yname].data.copy()
 
     # if data is 0-360 change to -180-180 to match shape file format
     lon_array[np.where(lon_array>180.)[0]] = lon_array[np.where(lon_array>180.)[0]]-360.

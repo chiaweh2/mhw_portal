@@ -77,6 +77,13 @@ if __name__ == '__main__':
     x_list_mj,y_list_mj = read_eez()
 
     da_region = region_mask(x_list_mj,y_list_mj,da_prob,xname='X',yname='Y')
+    # if da_mhw_anom['X'].min().data<0:
+    #     # change mask coordinate to -180-180
+    #     da_region['X'] = da_region['X'].where(
+    #         da_region['X']<=180.,
+    #         other=da_region['X']-360.
+    #     )
+
 
     #### Calculating area percentage
     da_global = da_num_mem.where(da_num_mem==0,other=1.)
@@ -140,7 +147,7 @@ if __name__ == '__main__':
     for nlead,lead in enumerate(leadtime):
         ax2 = fig.add_axes([0,0+GAP*nlead,1,0.5],projection=ccrs.PlateCarree(central_longitude=(region_limit[0]+region_limit[1])/2))
 
-        da2 = (da_prob).isel(L=lead)
+        da2 = (da_prob).isel(L=lead).sortby('X')
         if lead == leadtime[0] :
             ax2,im2 = plot_region_map(ax2,da2,clevels=plevel,ytick=False,cmap='inferno')
         else:
@@ -179,7 +186,7 @@ if __name__ == '__main__':
     for nlead,lead in enumerate(leadtime):
         ax2 = fig.add_axes([HGAP,0+GAP*nlead,1,0.5],
                         projection=ccrs.PlateCarree(central_longitude=(region_limit[0]+region_limit[1])/2))
-        da2 = (da_anomoly).isel(L=lead).mean(dim='M').mean(dim='model')
+        da2 = (da_anomoly).isel(L=lead).mean(dim='M').mean(dim='model').sortby('X')
         if lead == leadtime[0] :
             ax2,im2 = plot_region_map(ax2,da2,clevels=mlevel,ytickleft=False,cmap='OrRd')
         else:

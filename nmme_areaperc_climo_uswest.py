@@ -40,7 +40,8 @@ if __name__ == "__main__" :
 
     ### open local cluster
     client = Client(processes=False)
-
+    print(client.dashboard_link)
+    
     # used model list
     with open('model_use_list.json','r',encoding='utf-8') as f:
         json_dict = json.load(f)

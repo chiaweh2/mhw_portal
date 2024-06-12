@@ -35,6 +35,12 @@ if __name__ == "__main__":
     # create observation eez mask
     x_list_mj,y_list_mj = future.read_eez()
     da_obs_region = future.region_mask(x_list_mj,y_list_mj,da_unmask_01,xname='lon',yname='lat')
+    # if da_mask_01['X'].min().data<0:
+    #     # change mask coordinate to -180-180
+    #     da_obs_region['X'] = da_obs_region['X'].where(
+    #         da_obs_region['X']<=180.,
+    #         other=da_obs_region['X']-360.
+    #     )
 
     # mhw area
     da_mask_ts = hf.area_weighted_sum(da_mask_01*da_obs_region, xname='lon', yname='lat')
@@ -60,6 +66,12 @@ if __name__ == "__main__":
 
     # create nmme eez mask
     da_nmme_region = future.region_mask(x_list_mj,y_list_mj,da_unmask_01,xname='X',yname='Y')
+    # if da_mask_01['X'].min().data<0:
+    #     # change mask coordinate to -180-180
+    #     da_nmme_region['X'] = da_nmme_region['X'].where(
+    #         da_nmme_region['X']<=180.,
+    #         other=da_nmme_region['X']-360.
+    #     )    
 
     # mhw area
     da_mask_ts = hf.area_weighted_sum(da_mask_01*da_nmme_region, xname='X', yname='Y')
