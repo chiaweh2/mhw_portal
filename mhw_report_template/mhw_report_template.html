@@ -1,0 +1,274 @@
+{# mhw_report_template/mhw_report_template.html #}
+
+<!-- <div class="alert alert-danger" role="alert">
+  &#x1F389; New method for calculating global MHW coverage! 
+  <a href="#" id='methodLinkModal' data-toggle="modal" data-target="#textMethodModal" class="alert-link">Detail of changes here.</a>. &#x1F389;
+</div> -->
+<div class="alert alert-danger" role="alert">
+  &#x1F389; New model included for MHW forecast! &#x1F389;
+</div>
+<div class="alert alert-secondary" role="alert">
+  Marine heatwave forecasts are experimental and intended for research purposes
+</div>
+
+
+<h2>Marine Heatwave Forecast Monthly Report</h2>
+
+<!-- <div class="banner">
+  <p>
+    Marine heatwave forecasts are experimental and intended for research purposes
+  </p>
+</div> -->
+<!-- </br> -->
+
+<!-- report time -->
+<div class="container">
+  <div class="row">
+    <div class="col-sm-6">
+      <a data-toggle="tab" href="#forecasts">
+        <button type="button" id="forecastBtnID" class="btn btn-aqua forecastBtn">View Interactive Forecasts</button>
+      </a>
+    </div>
+    <div class="col-sm-6">
+      <h5 class="align-right">Forecast initial time <strong>{{start_month}} {{start_year}}</strong> </h5>
+      <h5 class="align-right">Forecast period <strong>{{start_month}} {{start_year}} - {{end_month}} {{end_year}}</strong> </h5> 
+      <div class="align-right-container">
+        <a href="https://list.woc.noaa.gov/listinfo/psl.mhw.forecast ">
+          <button type="button" id="emailListBtn" class="btn btn-psl">Sign up mailing list for monthly marine heatwaves discussion</button>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- text  -->
+<h3>Global Marine Heatwave Forecast Discussion</h3>
+<p class="smallP">
+  <em>
+    Observed and forecasted values include the effects of long-term warming. 
+    <span style="color: #d80505">Values with the long-term warming trend removed are in <strong>brackets</strong>.</span>
+  </em>
+</p>
+
+
+<h4><em><strong>Current marine heatwave conditions:</strong></em></h4>
+<p>
+  {{current_paragraph1}} 
+</p>
+<p>
+  {{current_paragraph2}}
+</p>
+
+
+<h4><em><strong>Marine heatwave forecasts:</strong></em></h4>
+<p>
+  {{forecast_paragraph1}}
+
+  <ul>
+    {% for region in list_regions %}
+      <li>
+        <strong>{{ region.region_name }}</strong> - {{ region.region_text }}
+      </li>
+    {% endfor %}
+  </ul>
+</p>
+<div class="basinDiv">
+  <p>How confidence levels are determined</p>
+  <button type="button" class="btn btn-primary btn-custom-cir" data-toggle="modal" data-target="#textModal">?</button>
+</div>
+
+
+</br>
+<!-- Map image -->
+<hr class="dot-hr">
+<h3>Marine Heatwave Maps</h3>
+<div class="radio-switch">
+    <p><strong>Remove long-term temperature trends?</strong></p>
+    <input type="radio" id="trendMapRadio" name="map-switch" checked>
+    <label for="trendMapRadio">No</label>
+    <input type="radio" id="detrendMapRadio" name="map-switch">
+    <label for="detrendMapRadio">Yes</label>
+</div>
+
+<div class="map-container">
+    <img class="imgThumbnail" id="trendMapImage" src="img/MHW_maps.png" alt="Marine Heatwave Map (warming trend preserved)">
+    <img class="imgThumbnail hidden" id="detrendMapImage" src="img/MHW_maps_detrend.png" alt="Marine Heatwave Map (warming trend removed)">
+</div>
+<center>
+    <p><strong>Click on the image to have a full screen view!</strong></p>
+</center>
+
+
+<!-- Bar image -->
+<hr class="dot-hr">
+<h3>Marine Heatwave Area Percentage - Monthly Forecast</h3>
+
+<div class="basinDiv">
+  <p>How the ocean basins are defined </p>
+  <button type="button" class="btn btn-primary btn-custom-cir" data-toggle="modal" data-target="#oceanModal">?</button>
+</div>
+<div class="radio-switch">
+    <p><strong>Remove long-term temperature trends?</strong></p>
+    <input type="radio" id="trendBarRadio" name="bar-switch" checked>
+    <label for="trendBarRadio">No</label>
+    <input type="radio" id="detrendBarRadio" name="bar-switch">
+    <label for="detrendBarRadio">Yes</label>
+</div>
+
+<div class="bar-container">
+    <img class="imgThumbnail" id="trendBarImage" src="img/MHW_area_bar.png" alt="Marine Heatwave Area Percentage Forecast (warming trend preserved)">
+    <img class="imgThumbnail hidden" id="detrendBarImage" src="img/MHW_area_bar_detrend.png" alt="Marine Heatwave Area Percentage Forecast (warming trend removed)">
+</div>
+<center>
+    <p><strong>Click on the image to have a full screen view!</strong></p>
+</center>
+<hr class="dot-hr">
+<h3>Marine Heatwave Area Percentage - Historical Record</h3>
+
+<!-- <div class="radio-switch">
+    <input type="radio" id="trendLineRadio" name="line-switch" checked>
+    <label for="trendLineRadio">With trend</label>
+    <input type="radio" id="detrendLineRadio" name="line-switch">
+    <label for="detrendLineRadio">Without trend</label>
+</div> -->
+
+<div class="line-container">
+    <img class="imgLineThumbnail" id="lineImage" src="img/MHW_area_history_only.png" alt="Marine Heatwave Area Percentage">
+    <!-- <img class="imgThumbnail hidden" id="detrendLineImage" src="img/MHW_area_bar_detrend.png" alt="Historic Marine Heatwave Area Percentage (Without trend)"> -->
+</div>
+<center>
+    <p><strong>Click on the image to view forecast plume!</strong></p>
+</center>
+
+<!-- Bootstrap Modal -->
+
+<!-- For text new method of area MHW -->
+<div class="modal fade" id="textMethodModal" tabindex="-1" role="dialog" aria-labelledby="textMethodModalTitle" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h3 class="modal-title" id="textMethodModalTitle">What has been changed to calculate the global area percentage of MHW?</h3>
+      </div>
+      <div class="modal-body">
+        <p>
+          The methodology employed prior to September 2023 for global marine heatwaves area percentage was a probabilistic approach. 
+          This approach involved identifying ocean areas with a forecasted probability exceeding 30%. 
+          Subsequently, this identified region was utilized to compute the percentage of the ocean area encompassed by marine heatwaves.
+        </p>
+        <p>
+          In contrast, the new methodology utilizes a deterministic approach to calculate the area percentage. 
+          It involves the identification of marine heatwaves in each ensemble member and model over the ocean (i.e., a binary 0 or 1). 
+          The area covered by marine heatwaves is then employed to determine the percentage of ocean area affected by marine heatwaves in each ensemble member and model. 
+          To provide a consolidated view, a multi-model mean of the area percentage is calculated, which offers insight into the overall percentage of ocean area affected by marine heatwaves.
+        </p>
+        <p>
+          A comparison of the two approaches can be seen below.
+        </p>
+        <img class="img-fluid" id="modalOcean" src="img/old_new_compare.png" alt="Compare Image">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- For text confidence interval -->
+<div class="modal fade" id="textModal" tabindex="-1" role="dialog" aria-labelledby="textModalTitle" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h3 class="modal-title" id="textModalTitle">How confidence levels are determined?</h3>
+      </div>
+      <div class="modal-body">
+        <p>
+          Forecast statement confidence levels are based on historical performance of 
+          forecasts in each region, as measured by the Symmetrical Extremal Dependence 
+          Index (SEDI). Confidence levels are “high” (SEDI = 0.66-1), “medium” (SEDI 0.33-0.66), 
+          and “low” (SEDI 0-0.33). See historical MHW skill maps for forecast confidence as a function of lead month. 
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- For ocean basin -->
+<div class="modal fade" id="oceanModal" tabindex="-1" role="dialog" aria-labelledby="oceanModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+          <h3 class="modal-title" id="oceanModalTitle">Ocean Basin Area</h3>
+        </div>
+        <div class="modal-body">
+            <img class="img-fluid" id="modalOcean" src="img/basin_demo_robinson.png" alt="Modal Image">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+</div>
+
+<!-- for the forecast images (maps, bars) -->
+<div class="modal fade imageModalLarge" id="imageModal" tabindex="-1" role="dialog" aria-labelledby="imageModalLabel" aria-hidden="true">
+    <div class="modal-xl" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+            <h3 class="modal-title" id="imageModalLabel"></h3>
+        </div>
+        <div class="modal-body">
+          <img class="img-fluid" id="modalImage" src="" alt="Modal Image">
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+</div>
+
+<!-- for the forecast images (time series) -->
+<div class="modal fade imageModalLarge" id="imagePlumeModal" tabindex="-1" role="dialog" aria-labelledby="imagePlumeModalLabel" aria-hidden="true">
+  <div class="modal-xl" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+          <h3 class="modal-title" id="imagePlumeModalLabel"></h3>
+      </div>
+      <div class="modal-body">
+        <div class="plumeModal-switch">
+          <p><strong>Remove long-term temperature trends?</strong></p>
+          <input type="radio" id="trendPlumeModalRadio" name="plumeModal-switch" value="img/MHW_area_plume.png" checked>
+          <label for="trendPlumeModalRadio">No</label>
+          <input type="radio" id="detrendPlumeModalRadio" name="plumeModal-switch" value="img/MHW_area_plume_detrend.png">
+          <label for="detrendPlumeModalRadio">Yes</label>
+        </div>
+        <img class="img-fluid" id="modalImagePlume" src="img/MHW_area_plume.png" alt="Forecast Plume">
+      </div>
+      <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<br>
+
+<script src="report.js"></script>
+<!-- <img id="MHW_demo" src="img/MHW_maps_demo3.png" alt="MHW from OISST" style="display: block; margin-left: auto; margin-right: auto; width: 50%;"> -->
