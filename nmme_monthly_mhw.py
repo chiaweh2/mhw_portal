@@ -26,7 +26,8 @@ def read_nmme_onlist(
         basedir: str,
         predir: str,
         start_year: int = 2021,
-        lazy: bool = False
+        lazy: bool = False,
+        chunks: dict = None,
 ) -> dict:
     """read in the NMME for MHW detection
 
@@ -66,6 +67,8 @@ def read_nmme_onlist(
             (if "model" number less than 2 will be masked)
     """
 
+    if chunks is None:
+        chunks = {'M':-1,'L':-1,'S':1}
 
     # read user input
     da_nmem_list = []
@@ -84,10 +87,15 @@ def read_nmme_onlist(
 
 
             # lazy loading all dataset
+            # ds_nmme = read_nmme(
+            #     forecast_files = forecast_files,
+            #     model = modelname,
+            #     chunks={'M':1,'L':1,'S':1}
+            # )
             ds_nmme = read_nmme(
                 forecast_files = forecast_files,
                 model = modelname,
-                chunks={'M':1,'L':1,'S':1}
+                chunks = chunks
             )
             # crop to only calculate the probability after 2020 (after Mike J's file)
             ds_nmme = ds_nmme.where(ds_nmme['S.year']>(start_year-1),drop=True)
@@ -95,7 +103,8 @@ def read_nmme_onlist(
             da_model = ds_nmme['sst']
 
             # read climatology (1991-2020)
-            da_ensmean_climo = xr.open_dataset(climo_file,chunks={'S':1,'L':1})['sst']
+            # da_ensmean_climo = xr.open_dataset(climo_file,chunks={'S':1,'L':1})['sst']
+            da_ensmean_climo = xr.open_dataset(climo_file)['sst']
 
             # calculate ensemble member in each model
             da_nmem = da_model.where(da_model.isnull(), other=1).sum(dim=['M'])
