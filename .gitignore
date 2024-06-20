@@ -1,6 +1,7 @@
 .vscode/
 data/
 dask-worker-space/
+resource/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
