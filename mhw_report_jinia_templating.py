@@ -10,7 +10,8 @@ def parse_draft():
 
     """
     # Read the HTML file
-    draft_file = '/Public/chsu/share_mhw/DraftofGlobalMHWForecastDiscussion.html'
+    # draft_file = '/Public/chsu/share_mhw/DraftofGlobalMHWForecastDiscussion.html'
+    draft_file = '/home/chsu/mhw_portal/mhw_report_draft.html'
     with open(draft_file, 'r', encoding='utf-8') as file:
         html_content = file.read()
 
@@ -51,7 +52,8 @@ def render_html(year=2000,month=6,current=True):
     draft from google doc.
 
     """
-    output_file = '/home/chsu/MHW/mhw_report_new.html'
+    # output_file = '/home/chsu/MHW/mhw_report_new.html'
+    output_file = '/home/chsu/mhw_portal/mhw_report_new.html'
 
     month_strings = calendar.month_name[1:]
 
@@ -74,8 +76,11 @@ def render_html(year=2000,month=6,current=True):
     replace_text = parse_draft()
 
     # open template file
+    # environment = Environment(
+    #     loader=FileSystemLoader("/home/chsu/MHW/mhw_report_template/")
+    # )
     environment = Environment(
-        loader=FileSystemLoader("/home/chsu/MHW/mhw_report_template/")
+        loader=FileSystemLoader("/home/chsu/mhw_portal/mhw_report_template/")
     )
     template = environment.get_template("mhw_report_template.html")
     rendered_html = template.render(
