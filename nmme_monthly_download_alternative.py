@@ -90,7 +90,6 @@ if __name__=="__main__":
         except ValueError:
             print('new data not available')
             continue
-        
 
         forecast_cftime = cftime.num2date(
             ds_forecast.S.values,
