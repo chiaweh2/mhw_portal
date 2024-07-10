@@ -31,7 +31,7 @@ warnings.simplefilter("ignore")
 
 def output_format(
         ds:xr.Dataset
-)->Tuple[xr.Dataset,dict]:
+    )->Tuple[xr.Dataset,dict]:
     """format the output dataset
 
     Parameters
@@ -131,6 +131,8 @@ if __name__ == "__main__":
     print(client.cluster.dashboard_link)
 
     ###### Setting ######
+    ENS_OUTPUT = True
+
     # specify date
     today = date.today()
     # setup the new output file name (same as date of download)
@@ -161,11 +163,20 @@ if __name__ == "__main__":
 
     ################################## Main program start #####################################
 
-    dict_da = read_nmme_onlist(model_use_list,avai_model_list,BASEDIR,PREDIR,start_year=1991,lazy=False)
+    dict_da = read_nmme_onlist(
+        model_use_list,
+        avai_model_list,
+        BASEDIR,
+        PREDIR,
+        start_year=1991,
+        lazy=False,
+        chunks = {'M':-1,'L':-1,'S':-1}
+    )
 
     ds_mask = read_marine_index_mask(MASKDIR)
 
     da_hci_list = []
+    da_hci_ens_list= []
     for nmodel,model in enumerate(model_use_list):
         if model in avai_model_list:
             threshold_file = f'{PREDIR}{model}_climo_threshold_hci.nc'
@@ -205,17 +216,28 @@ if __name__ == "__main__":
             print('calculating HCI')
             da_hci = da_sst.where(da_sst.groupby('S.month')<=da_threshold)
             # release the da_sst from the memory
-            del da_sst 
-            da_hci = (
+            del da_sst
+            da_hci_id = (
                 da_hci
                 .where(da_hci.isnull(),other=1)
                 .sum(dim=['M','X','Y'],skipna=True)
             ).compute()
-            da_hci_list.append(da_hci)
+            da_hci_list.append(da_hci_id)
+
+            if ENS_OUTPUT:
+                da_hci_ens = (
+                    da_hci
+                    .where(da_hci.isnull(),other=1)
+                    .sum(dim=['X','Y'],skipna=True)
+                ).compute()
+                da_hci_ens_list.append(da_hci_ens)          
+
 
     # total grid points lower than threshold (all ensemble and models)
     da_hci_all = xr.concat(da_hci_list,dim='model',join='outer')
     da_hci_all_out = da_hci_all.sum(dim='model',skipna=True)
+    if ENS_OUTPUT:
+        da_hci_ens_all = xr.concat(da_hci_ens_list,dim='model',join='outer')
 
     # calculate total grid points in the 150km region in all multi-model-ensemble
     da_total_grids = (
@@ -234,6 +256,26 @@ if __name__ == "__main__":
     ds_hci_ratio.attrs['comment'] = 'Derived at NOAA Physical Science Laboratory'
     ds_hci_ratio.attrs['reference'] = 'Brodie et al., 2023, https://doi.org/10.1038/s41467-023-43188-0'
     ds_hci_ratio['hci'] = da_hci_all_out/da_total_grids
+
+    if ENS_OUTPUT:
+        da_total_grids_ens = (
+            (
+                ds_mask['HCI_150km']
+                *dict_da['da_allmodel_mask']
+            )
+            .sum(dim=['X','Y'],skipna=True)
+        )
+        ds_hci_ens_ratio = xr.Dataset()
+        notes = 'HCI for all ensemble member derived from '
+        
+        ds_hci_ens_ratio.attrs['title'] = [f'{notes} {model}' for model in model_use_list]
+        ds_hci_ens_ratio.attrs['comment'] = 'Derived at NOAA Physical Science Laboratory'
+        ds_hci_ens_ratio.attrs['reference'] = 'Brodie et al., 2023, https://doi.org/10.1038/s41467-023-43188-0'
+        ds_hci_ens_ratio['hci'] = da_hci_ens_all/da_total_grids_ens
+        ds_hci_ens_ratio['model'] = model_use_list
+        ds_hci_ens_ratio = ds_hci_ens_ratio.drop_vars('month')
+        filename = OUTDIR + f'nmme_hci_ens_{date}.nc'
+        ds_hci_ens_ratio.to_netcdf(filename)
 
     #### formating output
     ds_hci_ratio, encoding = output_format(ds_hci_ratio)

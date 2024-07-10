@@ -38,6 +38,8 @@ if __name__ == "__main__":
     print(client.cluster.dashboard_link)
 
     ###### Setting ######
+    ENS_OUTPUT = True
+
     # specify date
     today = date.today()
     # setup the new output file name (same as date of download)
@@ -68,13 +70,21 @@ if __name__ == "__main__":
 
     ################################## Main program start #####################################
 
-    dict_da = read_nmme_onlist(model_use_list,avai_model_list,BASEDIR,PREDIR,start_year=1991,lazy=False)
+    dict_da = read_nmme_onlist(
+        model_use_list,
+        avai_model_list,
+        BASEDIR,
+        PREDIR,
+        start_year=1991,
+        lazy=False,
+        chunks = {'M':-1,'L':-1,'S':-1}
+    )
 
     ds_mask = read_marine_index_mask(MASKDIR)
 
-
     da_total_identified_list = []
     da_total_all_list = []
+    da_total_ens_list = []
     for nmodel,model in enumerate(model_use_list):
         if model in avai_model_list:
             threshold_file = f'{PREDIR}{model}_climo_threshold_total.nc'
@@ -109,12 +119,14 @@ if __name__ == "__main__":
             da_total = da_total.persist()
 
             print('calculating TOTAL')
+            # identify the event
             da_total_identified = da_total.where(da_total.groupby('S.month')>=da_threshold)
             da_total_identified = (
                 da_total_identified
                 .where(da_total_identified.isnull(),other=1)
                 .sum(dim=['M'],skipna=True)
             ).compute()
+            # calculate the total number of ensemble member that has value
             da_total_all = (
                 da_total
                 .where(da_total.isnull(),other=1)
@@ -122,6 +134,10 @@ if __name__ == "__main__":
             ).compute()
             da_total_identified_list.append(da_total_identified)
             da_total_all_list.append(da_total_all)
+
+            if ENS_OUTPUT:
+                da_total_ens = da_total.compute()
+                da_total_ens_list.append(da_total_ens)
 
             del da_total
 
@@ -137,6 +153,10 @@ if __name__ == "__main__":
         da_total_all_concat.sum(dim='model',skipna=True)
     ).compute()
 
+    if ENS_OUTPUT:
+        da_total_ens_all = xr.concat(da_total_ens_list,dim='model',join='outer')
+
+
     ds_total_prob = xr.Dataset()
     notes = 'TOTAL probability derived from '
     model_list_attr = [f'{model} ' for model in model_use_list]
@@ -147,6 +167,18 @@ if __name__ == "__main__":
     ds_total_prob['total_probability'] = (
         da_total_identified_concat_summodels/da_total_all_concat_summodels
     )
+
+    if ENS_OUTPUT:
+        ds_total_ens = xr.Dataset()
+        notes = 'TOTAL SSTA previous 6 month rolling mean for all ensemble member derived from '
+        ds_total_ens.attrs['title'] = [f'{notes} {model}' for model in model_use_list]
+        ds_total_ens.attrs['comment'] = 'Derived at NOAA Physical Science Laboratory'
+        ds_total_ens.attrs['reference'] = 'Brodie et al., 2023, https://doi.org/10.1038/s41467-023-43188-0'
+        ds_total_ens['total'] = da_total_ens_all
+        ds_total_ens['model'] = model_use_list
+        ds_total_ens = ds_total_ens.drop_vars('month')
+        filename = OUTDIR + f'nmme_total_ens_{date}.nc'
+        ds_total_ens.to_netcdf(filename)
 
     #### formating output
     ds_total_prob, encoding = output_format(ds_total_prob)
