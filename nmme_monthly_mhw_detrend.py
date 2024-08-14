@@ -109,6 +109,16 @@ if __name__ == "__main__":
 
         #### formating output
         ds_mhw_prob, encoding = output_format(ds_mhw_prob)
+        ds_mhw_prob.attrs['model_use'] = ', '.join(model_use_list)
+
+
+        #### concating the data since 2021 to jun2024 with CanSIP-IC3 with the CanSIP-IC4
+        # CanSIP-IC4 does not provide simulation from 2021 to Jun 2024 !!!!!
+        NOTES = 'change 2021-01 to 2024-06 to CanSIP-IC3 and only use CanSIP-IC4 start from 2024-07'
+        print(NOTES)
+        ds_old = xr.open_dataset(OUTDIR+f'NMME_prob{m}_detrend_CanSIP-IC3_frozen.nc')
+        ds_mhw_prob['mhw_probability'].loc[{'start_time': slice('2021-01','2024-06')}] = ds_old['mhw_probability']
+        ds_mhw_prob.attrs['model_use_notes'] = NOTES
 
         print('file output')
         print(OUTDIR + f'NMME_prob{m}_detrend_{date}.nc')
