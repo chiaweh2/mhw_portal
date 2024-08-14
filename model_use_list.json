@@ -1,8 +1,8 @@
 {
     "model_use_list" : 
         [
-        "CanCM4i-IC3",
-        "GEM5-NEMO",
+        "CanESM5",
+        "GEM5.2-NEMO",
         "GFDL-SPEAR-regridded",
         "NASA-GEOSS2S",
         "COLA-RSMAS-CCSM4",

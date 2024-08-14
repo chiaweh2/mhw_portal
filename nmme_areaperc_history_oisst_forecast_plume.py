@@ -4,6 +4,7 @@ The script is for creating the
 2. limited historical time series with the forecast plume plot
 
 """
+import json
 import warnings
 from datetime import date,datetime,timedelta
 import cftime
@@ -143,16 +144,21 @@ def nmme_newest_forecast(threshold=90):
     pmonth = prev_month_datetime.month
 
 
+    # # used model list
+    # model_list = [
+    #     'CanCM4i-IC3',
+    #     'GEM5-NEMO',
+    #     'GFDL-SPEAR-regridded',
+    #     'NASA-GEOSS2S',
+    #     'COLA-RSMAS-CCSM4',
+    #     'COLA-RSMAS-CESM1',
+    #     'NCEP-CFSv2'
+    # ]
+    
     # used model list
-    model_list = [
-        'CanCM4i-IC3',
-        'GEM5-NEMO',
-        'GFDL-SPEAR-regridded',
-        'NASA-GEOSS2S',
-        'COLA-RSMAS-CCSM4',
-        'COLA-RSMAS-CESM1',
-        'NCEP-CFSv2'
-    ]
+    with open('model_use_list.json','r',encoding='utf-8') as f:
+        json_dict = json.load(f)
+    model_list = json_dict['model_use_list']
     dict_model = iri_nmme_models()
     all_model_list = list(dict_model.keys())
 

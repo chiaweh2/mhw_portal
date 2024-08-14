@@ -70,10 +70,20 @@ def iri_nmme_models():
         'GFDL-SPEAR-regridded' : [
             f'{IRI_NMME}/.GFDL-SPEAR/.HINDCAST/.MONTHLY/.sst_regridded/dods',
             f'{IRI_NMME}/.GFDL-SPEAR/.FORECAST/.MONTHLY/.sst_regridded/dods'
-        ]
+        ],
+        'CanESM5' : [
+            f'{IRI_NMME}/.CanSIPS-IC4/.CanESM5/.HINDCAST/.MONTHLY/.sst/dods',
+            f'{IRI_NMME}/.CanSIPS-IC4/.CanESM5/.FORECAST/.MONTHLY/.sst/dods'  
+        ],
+        'GEM5.2-NEMO' : [
+            f'{IRI_NMME}/.CanSIPS-IC4/.GEM5.2-NEMO/.HINDCAST/.MONTHLY/.sst/dods',
+            f'{IRI_NMME}/.CanSIPS-IC4/.GEM5.2-NEMO/.FORECAST/.MONTHLY/.sst/dods'
+        ],
     }
 
     return model_iri_locations
+
+
 
 if __name__=="__main__":
 

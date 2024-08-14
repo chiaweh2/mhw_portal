@@ -114,7 +114,7 @@ def read_nmme(
 
         ds_model['sst'] = da_model
 
-    if model in ['CanCM4i-IC3']:
+    if model in ['CanCM4i-IC3','CanESM5']:
         # the unit is in Kelvin
         da_model = da_model-273.15
 
@@ -132,7 +132,7 @@ def read_nmme(
 
         ds_model['sst'] = da_model
 
-    if model in ['GEM5-NEMO']:
+    if model in ['GEM5-NEMO','GEM5.2-NEMO']:
         # the unit is in Kelvin
         da_model = da_model-273.15
 
@@ -188,7 +188,8 @@ if __name__ == "__main__":
         print('-------------')
         ds_nmme = read_nmme(
             forecast_files = forecast_nmme_files,
-            model = model_name
+            model = model_name,
+            chunks = {'S':-1,'M':-1,'L':-1,'X':-1,'Y':-1}
         )
 
         ds_nmme = ds_nmme.where(
