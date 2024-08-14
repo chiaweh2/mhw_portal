@@ -59,48 +59,51 @@ if __name__ == "__main__":
 
     # read user input
     model_list = []
-    for model_name in sys.argv[1:]:
-        if model_name in avai_model_list:
-            model_list.append(str(model_name))
-            print(f'{model_name} exist, add to process list')
-        else:
-            print(f'{model_name} does not exist')
-            print(f'Make sure pick model from {avai_model_list}')
+    if not sys.argv[1:] :
+        print(f'Make sure pick model from {avai_model_list}')
+    else:
+        for model_name in sys.argv[1:]:
+            if model_name in avai_model_list:
+                model_list.append(str(model_name))
+                print(f'{model_name} exist, add to process list')
+            else:
+                print(f'{model_name} does not exist')
+                print(f'Make sure pick model from {avai_model_list}')
 
-        # construct model list
-        forecast_nmme_files = f'{BASEDIR}{model_name}_forecast_??_??_??_??????.nc'
-        output_file = f'{OUTPUTDIR}{model_name}_climo_threshold_hci.nc'
+            # construct model list
+            forecast_nmme_files = f'{BASEDIR}{model_name}_forecast_??_??_??_??????.nc'
+            output_file = f'{OUTPUTDIR}{model_name}_climo_threshold_hci.nc'
 
-        # consistent climatology period
-        climatology_period = [1991,2020]
+            # consistent climatology period
+            climatology_period = [1991,2020]
 
-        print('-------------')
-        print(model_name)
-        print('-------------')
-        ds_nmme = read_nmme(
-            forecast_files = forecast_nmme_files,
-            model = model_name
-        )
+            print('-------------')
+            print(model_name)
+            print('-------------')
+            ds_nmme = read_nmme(
+                forecast_files = forecast_nmme_files,
+                model = model_name
+            )
 
-        ds_nmme = ds_nmme.where(
-            (ds_nmme['S.year']>=climatology_period[0])&
-            (ds_nmme['S.year']<=climatology_period[1]),
-            drop=True
-        )
+            ds_nmme = ds_nmme.where(
+                (ds_nmme['S.year']>=climatology_period[0])&
+                (ds_nmme['S.year']<=climatology_period[1]),
+                drop=True
+            )
 
-        ds_mask = read_marine_index_mask(MASKDIR)
-        da_hci = ds_mask['HCI_75km']*ds_nmme['sst']
-        # calculate area weight
-        weights = np.cos(np.deg2rad(da_hci.Y))
-        weights.name = "weights"
-        # calculate area weighted mean
-        da_hci_ts = da_hci.weighted(weights).mean(dim=["X","Y"])
+            ds_mask = read_marine_index_mask(MASKDIR)
+            da_hci = ds_mask['HCI_75km']*ds_nmme['sst']
+            # calculate area weight
+            weights = np.cos(np.deg2rad(da_hci.Y))
+            weights.name = "weights"
+            # calculate area weighted mean
+            da_hci_ts = da_hci.weighted(weights).mean(dim=["X","Y"])
 
-        ds_hci_ts = xr.Dataset()
-        ds_hci_ts['hci_threshold'] = da_hci_ts
-        
-        print('calculating climatology')
-        ds_ensmean_climo = nmme_ens_climo(ds_hci_ts,climo_dim='S',ens_dim='M').compute()
+            ds_hci_ts = xr.Dataset()
+            ds_hci_ts['hci_threshold'] = da_hci_ts
+            
+            print('calculating climatology')
+            ds_ensmean_climo = nmme_ens_climo(ds_hci_ts,climo_dim='S',ens_dim='M').compute()
 
-        print('file output')
-        ds_ensmean_climo.to_netcdf(output_file)
+            print('file output')
+            ds_ensmean_climo.to_netcdf(output_file)
