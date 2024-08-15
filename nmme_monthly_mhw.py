@@ -98,7 +98,7 @@ def read_nmme_onlist(
                 chunks = chunks
             )
 
-            
+
             # crop to only calculate the probability after 2020 (after Mike J's file)
             ds_nmme = ds_nmme.where(ds_nmme['S.year']>(start_year-1),drop=True)
 
@@ -307,7 +307,9 @@ if __name__ == "__main__":
         NOTES = 'change 2021-01 to 2024-06 to CanSIP-IC3 and only use CanSIP-IC4 start from 2024-07'
         print(NOTES)
         ds_old = xr.open_dataset(OUTDIR+f'NMME_prob{m}_CanSIP-IC3_frozen.nc')
-        ds_mhw_prob['mhw_probability'].loc[{'start_time': slice('2021-01','2024-06')}] = ds_old['mhw_probability']
+        ds_mhw_prob['mhw_probability'].loc[{'start_time': slice('2021-01','2024-06')}] = (
+            ds_old['mhw_probability']
+        )
         ds_mhw_prob.attrs['model_use_notes'] = NOTES
 
 
