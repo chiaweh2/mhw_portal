@@ -209,10 +209,10 @@ if __name__ == "__main__":
             #     da_sst = xr.concat(results_computed,dim='S')
             # else:
             #     da_sst = ds_mask['HCI_150km']*dict_da['da_model_list'][nmodel]
-      
+
             # called persist because da_sst is used twice in the following operation
             da_sst = (ds_mask['HCI_150km']*dict_da['da_model_list'][nmodel]).persist()
-            
+
             print('calculating HCI')
             da_hci = da_sst.where(da_sst.groupby('S.month')<=da_threshold)
             # release the da_sst from the memory
@@ -230,7 +230,7 @@ if __name__ == "__main__":
                     .where(da_hci.isnull(),other=1)
                     .sum(dim=['X','Y'],skipna=True)
                 ).compute()
-                da_hci_ens_list.append(da_hci_ens)          
+                da_hci_ens_list.append(da_hci_ens)
 
 
     # total grid points lower than threshold (all ensemble and models)
@@ -251,10 +251,14 @@ if __name__ == "__main__":
 
 
     ds_hci_ratio = xr.Dataset()
-    notes = 'HCI derived from '
-    ds_hci_ratio.attrs['title'] = [f'{notes} {model}' for model in model_use_list]
+    NOTES = 'HCI derived from '
+    MODEL_LIST = ', '.join(model_use_list)
+    ds_hci_ratio.attrs['title'] = f'{NOTES} {MODEL_LIST}'
     ds_hci_ratio.attrs['comment'] = 'Derived at NOAA Physical Science Laboratory'
-    ds_hci_ratio.attrs['reference'] = 'Brodie et al., 2023, https://doi.org/10.1038/s41467-023-43188-0'
+    ds_hci_ratio.attrs['reference'] = (
+        'Brodie et al., 2023, '+
+        'https://doi.org/10.1038/s41467-023-43188-0'
+    )
     ds_hci_ratio['hci'] = da_hci_all_out/da_total_grids
 
     if ENS_OUTPUT:
@@ -266,11 +270,13 @@ if __name__ == "__main__":
             .sum(dim=['X','Y'],skipna=True)
         )
         ds_hci_ens_ratio = xr.Dataset()
-        notes = 'HCI for all ensemble member derived from '
-        
-        ds_hci_ens_ratio.attrs['title'] = [f'{notes} {model}' for model in model_use_list]
+        NOTES = 'HCI for all ensemble member derived from '
+        ds_hci_ens_ratio.attrs['title'] = f'{NOTES} {MODEL_LIST}'
         ds_hci_ens_ratio.attrs['comment'] = 'Derived at NOAA Physical Science Laboratory'
-        ds_hci_ens_ratio.attrs['reference'] = 'Brodie et al., 2023, https://doi.org/10.1038/s41467-023-43188-0'
+        ds_hci_ens_ratio.attrs['reference'] = (
+            'Brodie et al., 2023, '+
+            'https://doi.org/10.1038/s41467-023-43188-0'
+        )
         ds_hci_ens_ratio['hci'] = da_hci_ens_all/da_total_grids_ens
         ds_hci_ens_ratio['model'] = model_use_list
         ds_hci_ens_ratio = ds_hci_ens_ratio.drop_vars('month')
@@ -279,6 +285,14 @@ if __name__ == "__main__":
 
     #### formating output
     ds_hci_ratio, encoding = output_format(ds_hci_ratio)
+
+    #### concating the data since 2021 to jun2024 with CanSIP-IC3 with the CanSIP-IC4
+    # CanSIP-IC4 does not provide simulation from 2021 to Jun 2024 !!!!!
+    NOTES = 'change 1990-01 to 2024-06 to CanSIP-IC3 and only use CanSIP-IC4 start from 2024-07'
+    print(NOTES)
+    ds_old = xr.open_dataset(OUTDIR+'nmme_hci_CanSIP-IC3_frozen.nc')
+    ds_hci_ratio['hci'].loc[{'start_time': slice('1990-01','2024-06')}] = ds_old['hci']
+    ds_hci_ratio.attrs['model_use_notes'] = NOTES
 
     print('file output')
     filename = OUTDIR + f'nmme_hci_{date}.nc'

@@ -158,22 +158,27 @@ if __name__ == "__main__":
 
 
     ds_total_prob = xr.Dataset()
-    notes = 'TOTAL probability derived from '
-    model_list_attr = [f'{model} ' for model in model_use_list]
-    model_list_attr = ' '.join(model_list_attr)
-    ds_total_prob.attrs['title'] = f'{notes} {model_list_attr}'
+    NOTES = 'TOTAL probability derived from '
+    MODEL_LIST = ', '.join(model_use_list)
+    ds_total_prob.attrs['title'] = f'{NOTES} {MODEL_LIST}'
     ds_total_prob.attrs['comment'] = 'Derived at NOAA Physical Science Laboratory'
-    ds_total_prob.attrs['reference'] = 'Brodie et al., 2023, https://doi.org/10.1038/s41467-023-43188-0'
+    ds_total_prob.attrs['reference'] = (
+        'Brodie et al., 2023, '+
+        'https://doi.org/10.1038/s41467-023-43188-0'
+    )
     ds_total_prob['total_probability'] = (
         da_total_identified_concat_summodels/da_total_all_concat_summodels
     )
 
     if ENS_OUTPUT:
         ds_total_ens = xr.Dataset()
-        notes = 'TOTAL SSTA previous 6 month rolling mean for all ensemble member derived from '
-        ds_total_ens.attrs['title'] = [f'{notes} {model}' for model in model_use_list]
+        NOTES = 'TOTAL SSTA previous 6 month rolling mean for all ensemble member derived from '
+        ds_total_ens.attrs['title'] = f'{NOTES} {MODEL_LIST}'
         ds_total_ens.attrs['comment'] = 'Derived at NOAA Physical Science Laboratory'
-        ds_total_ens.attrs['reference'] = 'Brodie et al., 2023, https://doi.org/10.1038/s41467-023-43188-0'
+        ds_total_ens.attrs['reference'] = (
+            'Brodie et al., 2023, '+
+            'https://doi.org/10.1038/s41467-023-43188-0'
+        )
         ds_total_ens['total'] = da_total_ens_all
         ds_total_ens['model'] = model_use_list
         ds_total_ens = ds_total_ens.drop_vars('month')
@@ -182,6 +187,17 @@ if __name__ == "__main__":
 
     #### formating output
     ds_total_prob, encoding = output_format(ds_total_prob)
+
+    #### concating the data since 2021 to jun2024 with CanSIP-IC3 with the CanSIP-IC4
+    # CanSIP-IC4 does not provide simulation from 2021 to Jun 2024 !!!!!
+    NOTES = 'change 1990-01 to 2024-06 to CanSIP-IC3 and only use CanSIP-IC4 start from 2024-07'
+    print(NOTES)
+    ds_old = xr.open_dataset(OUTDIR+'nmme_total_CanSIP-IC3_frozen.nc')
+    ds_total_prob['total_probability'].loc[{'start_time': slice('1990-01','2024-06')}] = (
+        ds_old['total_probability']
+    )
+    ds_total_prob.attrs['model_use_notes'] = NOTES
+
 
     print('file output')
     filename = OUTDIR + f'nmme_total_{date}.nc'
