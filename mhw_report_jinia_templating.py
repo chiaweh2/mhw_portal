@@ -1,3 +1,13 @@
+"""The script is designed to generate the monthly
+MHW report in html format.
+
+1. Download the google doc in html format
+2. copy the html code directly to `mhw_report_draft.html`
+3. have the html template in dir `mhw_report_template`
+4. use jinja to templating the new monthly report `mhw_report_new.html`
+
+one step of mhw_report_text_cron.sh in the crontab job 
+"""
 import calendar
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
@@ -100,5 +110,4 @@ def render_html(year=2000,month=6,current=True):
 
 
 if __name__ == "__main__":
-
-   render_html(current=True)
+    render_html(current=True)
