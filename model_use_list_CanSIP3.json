@@ -1,0 +1,14 @@
+{
+    "model_use_list" : 
+        [
+        "CanCM4i-IC3",
+        "GEM5-NEMO",
+        "GFDL-SPEAR-regridded",
+        "NASA-GEOSS2S",
+        "COLA-RSMAS-CCSM4",
+        "COLA-RSMAS-CESM1",
+        "NCEP-CFSv2"
+        ],
+    "retired" : "2024-06-30",
+    "note" : "CanSIP3 changed to CanSIP4 but CanSIP4 does not have data from 2021-2024 Jun so CanSIP3 is still used for 1991-2024(June)"
+}
