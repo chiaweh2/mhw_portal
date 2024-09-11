@@ -113,10 +113,14 @@ if __name__ == '__main__':
 
     # read in climo area data
     if CLIMO:
-        ds_perc_climo = xr.open_dataset(
-            '/Datasets.private/marinehw/NMME_preprocess/'+
-            'NMME_MHW_maskEneMean_areaPercEEZ_climo_detrend_1991_2020_newgenCanModel_plusCESM1_plusCCSM4.nc'
-        )
+        climo_areaperc_file = f'{PREDIR}NMME_MHW_maskEneMean_areaPercEEZ_climo_1991_2020_'
+        for nmodel, model in enumerate(model_use_list):
+            if model != model_use_list[-1]:
+                climo_areaperc_file = climo_areaperc_file+model+'_'
+            else:
+                climo_areaperc_file = climo_areaperc_file+model+'.nc'
+
+        ds_perc_climo = xr.open_dataset(climo_areaperc_file)
         ds_perc_climo = ds_perc_climo.where(ds_perc_climo!=0)
         # pick the same month in climo file
         month = da_mask_ts.month.data
