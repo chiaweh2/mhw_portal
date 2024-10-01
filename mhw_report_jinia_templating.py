@@ -8,6 +8,8 @@ MHW report in html format.
 
 one step of mhw_report_text_cron.sh in the crontab job 
 """
+import os
+import glob
 import calendar
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
@@ -18,11 +20,17 @@ def parse_draft():
     """
     The draft is the direct Google Drive document export html file
 
+    store in xxx/marinehw/html_draft/*.html
+
     """
     # Read the HTML file
     # draft_file = '/Public/chsu/share_mhw/DraftofGlobalMHWForecastDiscussion.html'
-    draft_file = '/home/chsu/mhw_portal/mhw_report_draft.html'
-    with open(draft_file, 'r', encoding='utf-8') as file:
+    # draft_file = '/home/chsu/mhw_portal/mhw_report_draft.html'
+    data_dir = os.getenv('DATASETSPRIVATE')
+    draft_files = glob.glob(f'{data_dir}marinehw/html_draft/*.html')
+    latest_draft_file = max(draft_files, key=os.path.getmtime)
+
+    with open(latest_draft_file, 'r', encoding='utf-8') as file:
         html_content = file.read()
 
     # Parse the HTML content
