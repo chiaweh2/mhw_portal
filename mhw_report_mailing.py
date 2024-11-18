@@ -16,17 +16,26 @@ def construct_body(soup):
     title = soup.find('h2')  # Example: Extract text within a <p> tag
     title = f"<h2> {title.text} </h2>"
 
+    # google form
+    googleform = (
+        '<p> Please feel free to provide feedback and comments through '+
+        'https://forms.gle/P9B33TYueo97C3ts8</p>'
+    )
+
     # Find banner
     banner1 = soup.find('div', class_='alert-secondary')
     banner1 = '<p> ('+banner1.text.strip() + ') <p>'
 
-    banner2 = soup.find('div', class_='alert-danger')
+    banner2 = soup.find('div', class_='alert-warning')
     banner2 = '<p> ('+banner2.text.strip() + ') <p>'
 
     # Find a forecast time
     forecast_initime = f"<p> {soup.find_all('h5')[0].text} </p>"
     forecast_period = f"<p> {soup.find_all('h5')[1].text} </p>"
-    add_link = '<p> For details and a more interactive interface, please visit https://psl.noaa.gov/marine-heatwaves/#report </p>'
+    add_link = (
+        '<p> For details and a more interactive interface, '+
+        'please visit https://psl.noaa.gov/marine-heatwaves/#report </p>'
+    )
 
     # parsed subtitle and content in order
     subtitle1 = f"<h3> [{soup.find_all('h3')[0].text}] </h3>"
@@ -49,6 +58,7 @@ def construct_body(soup):
     all_content = (
         "Content-Type: text/html\n\n<html><body>"+
         title+
+        googleform+
         banner1+
         banner2+
         forecast_initime+
@@ -69,15 +79,15 @@ def construct_body(soup):
 
     return all_content
 
-def construct_html_body(soup):
-    """
-    Contructing the body of the email based on 
-    the set format of marine heatwave report page.
+# def construct_html_body(soup):
+#     """
+#     Contructing the body of the email based on 
+#     the set format of marine heatwave report page.
 
-    If the structure of the page change the
-    code in this function might need to be adjusted.
-    """
-    print('test')
+#     If the structure of the page change the
+#     code in this function might need to be adjusted.
+#     """
+#     print('test')
 
 def send_email(recip_email, sub, body):
     """
@@ -87,7 +97,8 @@ def send_email(recip_email, sub, body):
 
     sendemail = f'echo -e "To: {recip_email}\nSubject: {sub}\n{body}" | sendmail -t'
 
-    use_sendmail = subprocess.call(
+    # execute send email
+    subprocess.call(
         sendemail,
         shell=True,
         executable="/usr/bin/bash"
@@ -103,13 +114,15 @@ if __name__ == "__main__":
             RECIPIENT_EMAIL = 'psl.mhw.forecast@list.woc.noaa.gov'
         elif sys.argv[1] == 'test':
             RECIPIENT_EMAIL = 'chia-wei.hsu@noaa.gov'
+        else :
+            RECIPIENT_EMAIL = None
     except IndexError:
         sys.exit('please put argument value of "mlist" or "test"')
 
     SUBJECT = f'NEW!!! {date.strftime("%Y %B")} Marine Heatwave Forecast Discussion'
 
     # Read the HTML file
-    with open('/httpd-test/psd/marine-heatwaves/report.html', 'r') as file:
+    with open('/httpd-test/psd/marine-heatwaves/report.html', 'r', encoding='utf-8') as file:
         html_content = file.read()
 
     # Parse the HTML content
@@ -117,4 +130,5 @@ if __name__ == "__main__":
     BODY = construct_body(html_parsed)
 
     # send out the email
-    send_email(RECIPIENT_EMAIL, SUBJECT, BODY)
+    if RECIPIENT_EMAIL:
+        send_email(RECIPIENT_EMAIL, SUBJECT, BODY)
