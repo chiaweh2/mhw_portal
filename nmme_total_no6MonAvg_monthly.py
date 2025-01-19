@@ -16,7 +16,7 @@ with variable SST
 # %%
 # start a local cluster
 import json
-# import subprocess
+import subprocess
 from datetime import date
 import warnings
 import numpy as np
@@ -25,7 +25,7 @@ from dask.distributed import Client
 from nmme_download import iri_nmme_models
 from nmme_hci_climo_threshold import read_marine_index_mask
 from nmme_monthly_mhw import read_nmme_onlist
-# from nmme_hci_monthly import output_format
+from nmme_hci_monthly import output_format
 
 warnings.simplefilter("ignore")
 
@@ -186,43 +186,26 @@ if __name__ == "__main__":
         ds_total_ens = ds_total_ens.drop_vars('month')
         filename = OUTDIR + f'nmme_total_ssta_ens_{date}.nc'
 
+
+
         #### concating the data since 2021 to jun2024 with CanSIP-IC3 with the CanSIP-IC4
         # CanSIP-IC4 does not provide simulation from 2021 to Jun 2024 !!!!!
         NOTES = 'change 1990-01 to 2024-06 to CanSIP-IC3 and only use CanSIP-IC4 start from 2024-07'
         print(NOTES)
         ds_old = xr.open_dataset(OUTDIR+'nmme_total_ssta_ens_CanSIP-IC3_frozen.nc')
-        ds_total_ens['total'].loc[{'start_time': slice('1990-01','2024-06')}] = (
+        # replace the new model coordinate name
+        ds_total_ens['model'] = ds_old['model']
+        # change new naming to align with the old naming
+        ds_total_ens = ds_total_ens.rename({'lead_time':'L','start_time':'S'})
+        # change the old time coordinate to the new time coordinate
+        ds_old['S'] = ds_total_ens.sel(S=slice('1990-01','2024-06'))['S'].data
+        # inplace replace the data
+        ds_total_ens['total'].loc[{'S': slice('1990-01','2024-06')}] = (
             ds_old['total']
         )
         ds_total_ens.attrs['model_use_notes'] = NOTES
 
+        print('file output')
+        filename = OUTDIR + f'nmme_total_ssta_ens_{date}.nc'
+        print(filename)
         ds_total_ens.to_netcdf(filename)
-
-    # #### formating output
-    # ds_total_prob, encoding = output_format(ds_total_prob)
-
-    # #### concating the data since 2021 to jun2024 with CanSIP-IC3 with the CanSIP-IC4
-    # # CanSIP-IC4 does not provide simulation from 2021 to Jun 2024 !!!!!
-    # NOTES = 'change 1990-01 to 2024-06 to CanSIP-IC3 and only use CanSIP-IC4 start from 2024-07'
-    # print(NOTES)
-    # ds_old = xr.open_dataset(OUTDIR+'nmme_total_CanSIP-IC3_frozen.nc')
-    # ds_total_prob['total'].loc[{'start_time': slice('1990-01','2024-06')}] = (
-    #     ds_old['total']
-    # )
-    # ds_total_prob.attrs['model_use_notes'] = NOTES
-
-
-    # print('file output')
-    # filename = OUTDIR + f'nmme_total_{date}.nc'
-    # print(filename)
-    # ds_total_prob.to_netcdf(filename,encoding=encoding)
-
-    # command_line = (
-    #     f"ln -fs {filename} {filename[:-11]}latest.nc"
-    # )
-    # print(command_line)
-    # subprocess.call(
-    #     command_line,
-    #     shell=True,
-    #     executable="/usr/bin/bash"
-    # )
