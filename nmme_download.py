@@ -87,7 +87,7 @@ def iri_nmme_models():
 
 if __name__=="__main__":
 
-    # user setting 
+    # user settings
     START_YEAR = 1991
     OUTPUTDIR = '/Datasets.private/marinehw/nmme_sst_raw/'
 
