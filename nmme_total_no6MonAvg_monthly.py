@@ -192,8 +192,6 @@ if __name__ == "__main__":
         ds_old = xr.open_dataset(OUTDIR+'nmme_total_ssta_ens_CanSIP-IC3_frozen.nc')
         # replace the new model coordinate name
         ds_total_ens['model'] = ds_old['model']
-        # change new naming to align with the old naming
-        ds_total_ens = ds_total_ens.rename({'lead_time':'L','start_time':'S'})
         # change the old time coordinate to the new time coordinate
         ds_old['S'] = ds_total_ens.sel(S=slice('1990-01','2024-06'))['S'].data
         # inplace replace the data
