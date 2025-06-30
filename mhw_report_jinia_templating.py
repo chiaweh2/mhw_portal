@@ -11,6 +11,8 @@ one step of mhw_report_text_cron.sh in the crontab job
 import os
 import glob
 import calendar
+import subprocess
+import filecmp
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from bs4 import BeautifulSoup
@@ -19,9 +21,7 @@ from jinja2 import Environment, FileSystemLoader
 def parse_draft():
     """
     The draft is the direct Google Drive document export html file
-
     store in xxx/marinehw/html_draft/*.html
-
     """
     # Read the HTML file
     # draft_file = '/Public/chsu/share_mhw/DraftofGlobalMHWForecastDiscussion.html'
@@ -30,8 +30,41 @@ def parse_draft():
     draft_files = glob.glob(f'{data_dir}marinehw/html_draft/*.html')
     latest_draft_file = max(draft_files, key=os.path.getmtime)
 
-    with open(latest_draft_file, 'r', encoding='utf-8') as file:
-        html_content = file.read()
+    # Download new file with wget
+    USE_DOWNLOAD_FROM_GITHUB = False
+    if USE_DOWNLOAD_FROM_GITHUB:
+        today_str = datetime.now().strftime("%Y%m%d")
+        temp_file = f'{data_dir}marinehw/html_draft/temp_draft_{today_str}.html'
+        url = 'https://raw.githubusercontent.com/chiaweh2/chiaweh2.github.io/refs/heads/master/temp_share/DraftofGlobalMHWForecastDiscussion.html'  # Replace with your actual URL
+
+
+
+        try:
+            subprocess.run(['wget', '-q', url, '-O', temp_file], check=True)
+
+            # Compare files
+            if os.path.exists(temp_file):
+                if filecmp.cmp(temp_file, latest_draft_file, shallow=False):
+                    print("Files are identical - no update needed")
+                    os.remove(temp_file)
+                    return None
+
+                # Files are different, proceed with parsing new file
+                with open(temp_file, 'r', encoding='utf-8') as file:
+                    html_content = file.read()
+            else:
+                print(f"Error: Temporary file {temp_file} does not exist. Download may have failed.")
+                return None
+
+        except subprocess.CalledProcessError as e:
+            print(f"Error downloading file: {e}")
+            if os.path.exists(temp_file):
+                os.remove(temp_file)
+            return None
+    else:
+        # Use the latest draft file directly
+        with open(latest_draft_file, 'r', encoding='utf-8') as file:
+            html_content = file.read()
 
     # Parse the HTML content
     html_parsed = BeautifulSoup(html_content, 'html.parser')
