@@ -1,4 +1,3 @@
-# %%
 """
 # NMME Temperature Observations to Avoid Loggerheads (TOTAL)
  
@@ -13,7 +12,6 @@ with variable SST
 """
 
 
-# %%
 # start a local cluster
 import json
 import subprocess
@@ -25,7 +23,6 @@ from dask.distributed import Client
 from nmme_download import iri_nmme_models
 from nmme_hci_climo_threshold import read_marine_index_mask
 from nmme_monthly_mhw import read_nmme_onlist
-from nmme_hci_monthly import output_format
 
 warnings.simplefilter("ignore")
 
@@ -208,4 +205,18 @@ if __name__ == "__main__":
         print('file output')
         filename = OUTDIR + f'nmme_total_ssta_ens_{date}.nc'
         print(filename)
+        ds_total_ens.to_netcdf(filename)
+
+        command_line = (
+            f"ln -fs {filename} {filename[:-11]}latest.nc"
+        )
+        print(command_line)
+        subprocess.call(
+            command_line,
+            shell=True,
+            executable="/usr/bin/bash"
+        )
+
+        OUTPUT_PUBLIC_DIR = '/Public/chsu/share_mhw/'
+        filename = OUTPUT_PUBLIC_DIR + f'nmme_total_ssta_ens_{date}.nc'
         ds_total_ens.to_netcdf(filename)

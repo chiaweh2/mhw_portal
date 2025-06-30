@@ -213,3 +213,7 @@ if __name__ == "__main__":
         shell=True,
         executable="/usr/bin/bash"
     )
+    
+    OUTPUT_PUBLIC_DIR = '/Public/chsu/share_mhw/'
+    filename = OUTPUT_PUBLIC_DIR + f'nmme_total_{date}.nc'
+    ds_total_prob.to_netcdf(filename,encoding=encoding)
