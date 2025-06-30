@@ -19,70 +19,24 @@ import glob
 import datetime
 import cftime
 import xarray as xr
+import json
+import os
 
 
-# %%
-def iri_nmme_models():
+
+def iri_nmme_models(json_path='iri_nmme_models.json'):
     """
-    Function defining the NMME models locations for 
-    both hindcast and forecast output
-
-    hindcast first in the list 
-    forecast second in the list
+    Load the NMME models locations for both hindcast and forecast output from a JSON file.
+    Returns only the model_iri_locations dictionary.
     """
+    if not os.path.exists(json_path):
+        raise FileNotFoundError(f"JSON file {json_path} not found.")
 
-    IRI_NMME = 'http://iridl.ldeo.columbia.edu/SOURCES/.Models/.NMME'
+    with open(json_path, 'r') as f:
+        data = json.load(f)
 
-    model_iri_locations = {
-        'CanCM4i' : [
-            f'{IRI_NMME}/.CanCM4i/.HINDCAST/.MONTHLY/.sst/dods',
-            f'{IRI_NMME}/.CanCM4i/.FORECAST/.MONTHLY/.sst/dods'
-        ],
-        'GEM-NEMO' : [
-            f'{IRI_NMME}/.GEM-NEMO/.HINDCAST/.MONTHLY/.sst/dods',
-            f'{IRI_NMME}/.GEM-NEMO/.FORECAST/.MONTHLY/.sst/dods'
-        ],
-        'GFDL-SPEAR' : [
-            f'{IRI_NMME}/.GFDL-SPEAR/.HINDCAST/.MONTHLY/.sst/dods',
-            f'{IRI_NMME}/.GFDL-SPEAR/.FORECAST/.MONTHLY/.sst/dods'       
-        ],
-        'NASA-GEOSS2S': [
-            f'{IRI_NMME}/.NASA-GEOSS2S/.HINDCAST/.MONTHLY/.sst/dods',
-            f'{IRI_NMME}/.NASA-GEOSS2S/.FORECAST/.MONTHLY/.sst/dods'       
-        ],
-        'COLA-RSMAS-CCSM4' : [
-            f'{IRI_NMME}/.COLA-RSMAS-CCSM4/.MONTHLY/.sst/dods'
-        ],
-        'NCEP-CFSv2' : [
-            f'{IRI_NMME}/.NCEP-CFSv2/.HINDCAST/.PENTAD_SAMPLES_FULL/.sst/dods'
-        ],
-        'CanCM4i-IC3' : [
-            f'{IRI_NMME}/.CanSIPS-IC3/.CanCM4i-IC3/.HINDCAST/.MONTHLY/.sst/dods',
-            f'{IRI_NMME}/.CanSIPS-IC3/.CanCM4i-IC3/.FORECAST/.MONTHLY/.sst/dods'  
-        ],
-        'GEM5-NEMO' : [
-            f'{IRI_NMME}/.CanSIPS-IC3/.GEM5-NEMO/.HINDCAST/.MONTHLY/.sst/dods',
-            f'{IRI_NMME}/.CanSIPS-IC3/.GEM5-NEMO/.FORECAST/.MONTHLY/.sst/dods'
-        ],
-        'COLA-RSMAS-CESM1' : [
-            f'{IRI_NMME}/.COLA-RSMAS-CESM1/.MONTHLY/.sst/dods'
-        ],
-        'GFDL-SPEAR-regridded' : [
-            f'{IRI_NMME}/.GFDL-SPEAR/.HINDCAST/.MONTHLY/.sst_regridded/dods',
-            f'{IRI_NMME}/.GFDL-SPEAR/.FORECAST/.MONTHLY/.sst_regridded/dods'
-        ],
-        'CanESM5' : [
-            f'{IRI_NMME}/.CanSIPS-IC4/.CanESM5/.HINDCAST/.MONTHLY/.sst/dods',
-            f'{IRI_NMME}/.CanSIPS-IC4/.CanESM5/.FORECAST/.MONTHLY/.sst/dods'  
-        ],
-        'GEM5.2-NEMO' : [
-            f'{IRI_NMME}/.CanSIPS-IC4/.GEM5.2-NEMO/.HINDCAST/.MONTHLY/.sst/dods',
-            f'{IRI_NMME}/.CanSIPS-IC4/.GEM5.2-NEMO/.FORECAST/.MONTHLY/.sst/dods'
-        ],
-    }
-
+    model_iri_locations = data.get("model_iri_locations")
     return model_iri_locations
-
 
 
 if __name__=="__main__":
