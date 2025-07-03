@@ -1,0 +1,30 @@
+name: py3.10
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - boto3
+  - ca-certificates
+  - cartopy
+  - certifi
+  - cfgrib
+  - dash
+  - dask
+  - gcsfs
+  - gsw
+  - jupyterlab
+  - matplotlib
+  - nc-time-axis
+  - netcdf4
+  - openssl
+  - plotly
+  - pydap
+  - pylint
+  - python=3.10
+  - scipy
+  - xarray
+  - xesmf
+  - zarr
+  - holoviews
+  - jupyter_bokeh
+prefix: /home/chsu/.conda/envs/py3.10
