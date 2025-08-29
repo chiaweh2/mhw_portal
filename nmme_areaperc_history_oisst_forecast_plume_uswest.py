@@ -23,8 +23,8 @@ if __name__ == "__main__":
     client = Client(processes=False)
     region_limit = [-160,-115,25,60]
     PREMONTH = 24                          # historical record to include in plume plot (month)
-    OUTPUTDIR = '/home/chsu/mhw_portal/figures/'
-    # OUTPUTDIR = '/httpd-test/psd/marine-heatwaves/img/'
+    # OUTPUTDIR = '/home/chsu/mhw_portal/figures/'
+    OUTPUTDIR = '/httpd-test/psd/marine-heatwaves/img/'
 
     #### Calculating area percentage for observational data
     obs_mask_dict = hf.all_obs_area_mask()

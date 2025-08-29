@@ -323,7 +323,7 @@ if __name__ == '__main__':
             cbar.ax.tick_params(labelsize=20,rotation=60)
             cbar.set_label(label='MHW magnitude (degC)',size=20, labelpad=15)
 
-    fig.savefig('/home/chsu/mhw_portal/figures/MHW_maps_eez.png', dpi=150, facecolor='w', edgecolor='w',
+    fig.savefig('/httpd-test/psd/marine-heatwaves/img/MHW_maps_eez.png', dpi=150, facecolor='w', edgecolor='w',
                     orientation='portrait', format=None,
                     transparent=False, bbox_inches="tight", pad_inches=None)
 
@@ -366,7 +366,7 @@ if __name__ == '__main__':
     ax1.grid(linestyle='dashed')
 
     fig.savefig(
-        '/home/chsu/mhw_portal/figures/MHW_area_bar_eez.png',
+        '/httpd-test/psd/marine-heatwaves/img/MHW_area_bar_eez.png',
         dpi=300, facecolor='w', edgecolor='w',
         orientation='portrait',
         transparent=False,

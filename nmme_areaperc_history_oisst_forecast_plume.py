@@ -1058,7 +1058,7 @@ if __name__ == "__main__":
     # OUTPUTDIR = '/home/chsu/mhw_portal/figures/'
     # OUTPUT_DATA_DIR = '/home/chsu/mhw_portal/data/'
     OUTPUTDIR = '/httpd-test/psd/marine-heatwaves/img/'
-    OUTPUT_DATA_DIR = '/Public/chsu/share_mhw/'
+    OUTPUT_DATA_DIR = '/Datasets/marinehw/'
 
 
     #### Calculating area percentage for observational data

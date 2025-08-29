@@ -24,19 +24,15 @@ def parse_draft():
     store in xxx/marinehw/html_draft/*.html
     """
     # Read the HTML file
-    # draft_file = '/Public/chsu/share_mhw/DraftofGlobalMHWForecastDiscussion.html'
-    # draft_file = '/home/chsu/mhw_portal/mhw_report_draft.html'
-    data_dir = os.getenv('DATASETSPRIVATE')
-    draft_files = glob.glob(f'{data_dir}marinehw/html_draft/*.html')
+    draft_files = glob.glob('/Datasets.private/marinehw/html_draft/*.html')
     latest_draft_file = max(draft_files, key=os.path.getmtime)
 
     # Download new file with wget
     USE_DOWNLOAD_FROM_GITHUB = False
     if USE_DOWNLOAD_FROM_GITHUB:
         today_str = datetime.now().strftime("%Y%m%d")
-        temp_file = f'{data_dir}marinehw/html_draft/temp_draft_{today_str}.html'
+        temp_file = f'/Datasets.private/marinehw/html_draft/temp_draft_{today_str}.html'
         url = 'https://raw.githubusercontent.com/chiaweh2/chiaweh2.github.io/refs/heads/master/temp_share/DraftofGlobalMHWForecastDiscussion.html'  # Replace with your actual URL
-
 
 
         try:
@@ -103,8 +99,7 @@ def render_html(year=2000,month=6,current=True):
     draft from google doc.
 
     """
-    # output_file = '/home/chsu/MHW/mhw_report_new.html'
-    output_file = '/home/chsu/mhw_portal/mhw_report_new.html'
+    output_file = '/httpd-test/psd/marine-heatwaves/report.html'
 
     month_strings = calendar.month_name[1:]
 
@@ -127,11 +122,8 @@ def render_html(year=2000,month=6,current=True):
     replace_text = parse_draft()
 
     # open template file
-    # environment = Environment(
-    #     loader=FileSystemLoader("/home/chsu/MHW/mhw_report_template/")
-    # )
     environment = Environment(
-        loader=FileSystemLoader("/home/chsu/mhw_portal/mhw_report_template/")
+        loader=FileSystemLoader("/Datasets.private/marinehw/html_draft/")
     )
     template = environment.get_template("mhw_report_template.html")
     rendered_html = template.render(

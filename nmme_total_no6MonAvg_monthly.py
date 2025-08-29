@@ -215,6 +215,6 @@ if __name__ == "__main__":
             executable="/usr/bin/bash"
         )
 
-        OUTPUT_PUBLIC_DIR = '/Public/chsu/share_mhw/'
-        filename = OUTPUT_PUBLIC_DIR + f'nmme_total_ssta_ens_{date}.nc'
-        ds_total_ens.to_netcdf(filename)
+        # OUTPUT_PUBLIC_DIR = '/Public/chsu/share_mhw/'
+        # filename = OUTPUT_PUBLIC_DIR + f'nmme_total_ssta_ens_{date}.nc'
+        # ds_total_ens.to_netcdf(filename)

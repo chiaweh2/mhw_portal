@@ -309,6 +309,6 @@ if __name__ == "__main__":
         executable="/usr/bin/bash"
     )
 
-    OUTPUT_PUBLIC_DIR = '/Public/chsu/share_mhw/'
-    filename = OUTPUT_PUBLIC_DIR + f'nmme_hci_{date}.nc'
-    ds_hci_ratio.to_netcdf(filename,encoding=encoding)
+    # OUTPUT_PUBLIC_DIR = '/Public/chsu/share_mhw/'
+    # filename = OUTPUT_PUBLIC_DIR + f'nmme_hci_{date}.nc'
+    # ds_hci_ratio.to_netcdf(filename,encoding=encoding)
