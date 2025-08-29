@@ -43,52 +43,67 @@ if __name__=="__main__":
 
     # user settings
     START_YEAR = 1991
-    OUTPUTDIR = '/Datasets.private/marinehw/nmme_sst_raw/'
+    OUTPUTDIR = '/scratch/chsu/NMME/'
 
     # date form (download stamp)
     today = datetime.date.today()
     dateform = today.strftime("%y_%m_%d")
 
     # get all hindcast and forecast IRI OPeNDAP URL
-    NMME_IRI_LOC = iri_nmme_models()
+    NMME_IRI_LOC = iri_nmme_models('iri_nmme_models_prec.json')
 
     # opendap lazy loading (IRI availibility)
     dict_model = {}
     nmme_name = []
     for name,links in NMME_IRI_LOC.items():
-        print('=============')
-        print(f'downloading {name}')
-        nmme_name.append(name)
-        dict_model[name] = []
+        try:
+            print('=============')
+            print(f'downloading {name}')
+            nmme_name.append(name)
+            dict_model[name] = []
 
-        for link in links:
-            # open links to the whole set of available
-            ds_temp = xr.open_dataset(link, chunks={'M':1,'L':1,'S':1},decode_times=False)
-            dict_model[name].append(ds_temp)
+            for link in links:
+                try:
+                    # open links to the whole set of available
+                    ds_temp = xr.open_dataset(link, chunks={'M':1,'L':1,'S':1},decode_times=False)
+                    dict_model[name].append(ds_temp)
 
-            # all available initial time in the link
-            initial_time = cftime.num2date(
-                ds_temp.S.values,
-                ds_temp.S.units,
-                calendar='360_day'
-            )
-
-            # download each initial time seperately
-            for s,S in enumerate(ds_temp.S.data):
-                if initial_time[s].year >= START_YEAR:
-                    FILENAME = f'{name}_forecast_{dateform}_{initial_time[s].year:04d}{initial_time[s].month:02d}.nc'
-
-                    # find on prem storage availability
-                    FILENAME_WILD = f'{name}_forecast_??_??_??_{initial_time[s].year:04d}{initial_time[s].month:02d}.nc'
-                    on_disc_list = glob.glob(
-                        f'{OUTPUTDIR}'+FILENAME_WILD
+                    # all available initial time in the link
+                    initial_time = cftime.num2date(
+                        ds_temp.S.values,
+                        ds_temp.S.units,
+                        calendar='360_day'
                     )
-                    if len(on_disc_list) > 0:
-                        print('forecast file already exist on prem')
-                        print(on_disc_list)
-                    else:
-                        print(f'downloading forecast file {FILENAME}')
-                        print(f'from {link}')
-                        ds_temp.sel(S=S).to_netcdf(
-                            f'{OUTPUTDIR}'+ FILENAME
-                        )
+
+                    # download each initial time seperately
+                    for s,S in enumerate(ds_temp.S.data):
+                        if initial_time[s].year >= START_YEAR:
+                            FILENAME = f'{name}_forecast_{dateform}_{initial_time[s].year:04d}{initial_time[s].month:02d}.nc'
+
+                            # find on prem storage availability
+                            FILENAME_WILD = f'{name}_forecast_??_??_??_{initial_time[s].year:04d}{initial_time[s].month:02d}.nc'
+                            on_disc_list = glob.glob(
+                                f'{OUTPUTDIR}'+FILENAME_WILD
+                            )
+                            if len(on_disc_list) > 0:
+                                print('forecast file already exist on prem')
+                                print(on_disc_list)
+                            else:
+                                print(f'downloading forecast file {FILENAME}')
+                                print(f'from {link}')
+                                ds_temp.sel(S=S).to_netcdf(
+                                    f'{OUTPUTDIR}'+ FILENAME
+                                )
+                except OSError as e:
+                    print(f'Network error accessing {link}: {e}')
+                    print(f'Skipping this link for {name}')
+                    continue
+                except Exception as e:
+                    print(f'Error processing link {link}: {e}')
+                    print(f'Skipping this link for {name}')
+                    continue
+                    
+        except Exception as e:
+            print(f'Model download error: {name}')
+            print(f'Error details: {e}')
+            continue

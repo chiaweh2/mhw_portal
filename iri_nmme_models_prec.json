@@ -1,0 +1,33 @@
+{
+  "model_iri_locations": {
+    "GFDL-SPEAR": [
+      "http://iridl.ldeo.columbia.edu/SOURCES/.Models/.NMME/.GFDL-SPEAR/.HINDCAST/.MONTHLY/.prec/dods",
+      "http://iridl.ldeo.columbia.edu/SOURCES/.Models/.NMME/.GFDL-SPEAR/.FORECAST/.MONTHLY/.prec/dods"
+    ],
+    "NASA-GEOSS2S": [
+      "http://iridl.ldeo.columbia.edu/SOURCES/.Models/.NMME/.NASA-GEOSS2S/.HINDCAST/.MONTHLY/.prec/dods",
+      "http://iridl.ldeo.columbia.edu/SOURCES/.Models/.NMME/.NASA-GEOSS2S/.FORECAST/.MONTHLY/.prec/dods"
+    ],
+    "COLA-RSMAS-CCSM4": [
+      "http://iridl.ldeo.columbia.edu/SOURCES/.Models/.NMME/.COLA-RSMAS-CCSM4/.MONTHLY/.prec/dods"
+    ],
+    "NCEP-CFSv2": [
+      "http://iridl.ldeo.columbia.edu/SOURCES/.Models/.NMME/.NCEP-CFSv2/.HINDCAST/.PENTAD_SAMPLES_FULL/.prec/dods"
+    ],
+    "GEM5-NEMO": [
+      "http://iridl.ldeo.columbia.edu/SOURCES/.Models/.NMME/.CanSIPS-IC3/.GEM5-NEMO/.HINDCAST/.MONTHLY/.prec/dods",
+      "http://iridl.ldeo.columbia.edu/SOURCES/.Models/.NMME/.CanSIPS-IC3/.GEM5-NEMO/.FORECAST/.MONTHLY/.prec/dods"
+    ],
+    "COLA-RSMAS-CESM1": [
+      "http://iridl.ldeo.columbia.edu/SOURCES/.Models/.NMME/.COLA-RSMAS-CESM1/.MONTHLY/.prec/dods"
+    ],
+    "CanESM5": [
+      "http://iridl.ldeo.columbia.edu/SOURCES/.Models/.NMME/.CanSIPS-IC4/.CanESM5/.HINDCAST/.MONTHLY/.prec/dods",
+      "http://iridl.ldeo.columbia.edu/SOURCES/.Models/.NMME/.CanSIPS-IC4/.CanESM5/.FORECAST/.MONTHLY/.prec/dods"
+    ],
+    "GEM5.2-NEMO": [
+      "http://iridl.ldeo.columbia.edu/SOURCES/.Models/.NMME/.CanSIPS-IC4/.GEM5.2-NEMO/.HINDCAST/.MONTHLY/.prec/dods",
+      "http://iridl.ldeo.columbia.edu/SOURCES/.Models/.NMME/.CanSIPS-IC4/.GEM5.2-NEMO/.FORECAST/.MONTHLY/.prec/dods"
+    ]
+  }
+}
