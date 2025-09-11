@@ -14,10 +14,6 @@
     "NCEP-CFSv2": [
       "http://iridl.ldeo.columbia.edu/SOURCES/.Models/.NMME/.NCEP-CFSv2/.HINDCAST/.PENTAD_SAMPLES_FULL/.prec/dods"
     ],
-    "GEM5-NEMO": [
-      "http://iridl.ldeo.columbia.edu/SOURCES/.Models/.NMME/.CanSIPS-IC3/.GEM5-NEMO/.HINDCAST/.MONTHLY/.prec/dods",
-      "http://iridl.ldeo.columbia.edu/SOURCES/.Models/.NMME/.CanSIPS-IC3/.GEM5-NEMO/.FORECAST/.MONTHLY/.prec/dods"
-    ],
     "COLA-RSMAS-CESM1": [
       "http://iridl.ldeo.columbia.edu/SOURCES/.Models/.NMME/.COLA-RSMAS-CESM1/.MONTHLY/.prec/dods"
     ],
