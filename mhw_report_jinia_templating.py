@@ -28,13 +28,14 @@ def parse_draft():
     latest_draft_file = max(draft_files, key=os.path.getmtime)
 
     # Download new file with wget
-    USE_DOWNLOAD_FROM_GITHUB = False
+    USE_DOWNLOAD_FROM_GITHUB = True
     if USE_DOWNLOAD_FROM_GITHUB:
         today_str = datetime.now().strftime("%Y%m%d")
-        temp_file = f'/Datasets.private/marinehw/html_draft/temp_draft_{today_str}.html'
-        url = 'https://raw.githubusercontent.com/chiaweh2/chiaweh2.github.io/refs/heads/master/temp_share/DraftofGlobalMHWForecastDiscussion.html'  # Replace with your actual URL
-
-
+        year_month_str = datetime.now().strftime("%Y%m")
+        # temp_file = f'/Datasets.private/marinehw/html_draft/temp_draft_{today_str}.html'
+        #url = 'https://raw.githubusercontent.com/chiaweh2/chiaweh2.github.io/refs/heads/master/temp_share/DraftofGlobalMHWForecastDiscussion.html'  # Replace with your actual URL
+        url = f'https://raw.githubusercontent.com/NOAA-PSL/marine_heatwave_discussion/refs/heads/main/GlobalMHWForecastDiscussion{year_month_str}.html'
+        temp_file = f'/Datasets.private/marinehw/html_draft/GlobalMHWForecastDiscussion{year_month_str}.html'
         try:
             subprocess.run(['wget', '-q', url, '-O', temp_file], check=True)
 
@@ -56,7 +57,9 @@ def parse_draft():
             print(f"Error downloading file: {e}")
             if os.path.exists(temp_file):
                 os.remove(temp_file)
-            return None
+            with open(latest_draft_file, 'r', encoding='utf-8') as file:
+                html_content = file.read()
+            
     else:
         # Use the latest draft file directly
         with open(latest_draft_file, 'r', encoding='utf-8') as file:
