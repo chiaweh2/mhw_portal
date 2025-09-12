@@ -28,7 +28,7 @@ def parse_draft():
     latest_draft_file = max(draft_files, key=os.path.getmtime)
 
     # Download new file with wget
-    USE_DOWNLOAD_FROM_GITHUB = False
+    USE_DOWNLOAD_FROM_GITHUB = True
     if USE_DOWNLOAD_FROM_GITHUB:
         today_str = datetime.now().strftime("%Y%m%d")
         temp_file = f'/Datasets.private/marinehw/html_draft/temp_draft_{today_str}.html'
